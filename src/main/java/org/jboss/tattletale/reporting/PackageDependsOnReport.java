@@ -36,17 +36,20 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * Class level Depends On report
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * Reporting class that will generate package level
+ * reports like how {@link ClassDependsOnReport}
+ * does on class level reports.
+ * <br />
+ * @author Navin Surtani
  */
-public class ClassDependsOnReport extends CLSReport
+
+public class PackageDependsOnReport extends CLSReport
 {
-   /** NAME */
-   private static final String NAME = "Class Depends On";
+   /**NAME*/
+   private static final String NAME = "Package Depends On";
 
-   /** DIRECTORY */
-   private static final String DIRECTORY = "classdependson";
-
+   /**DIRECTORY*/
+   private static final String DIRECTORY = "packagedependson";
 
    /**
     * Constructor
@@ -54,25 +57,43 @@ public class ClassDependsOnReport extends CLSReport
     * @param known The set of known archives
     * @param classloaderStructure The classloader structure
     */
-   public ClassDependsOnReport(SortedSet<Archive> archives,
-                               List<Archive> known,
-                               String classloaderStructure)
+   public PackageDependsOnReport(SortedSet<Archive> archives,
+                                 List<Archive> known,
+                                 String classloaderStructure)
    {
       super(DIRECTORY, ReportSeverity.INFO, archives, NAME, DIRECTORY, classloaderStructure, known);
    }
 
+   /**
+    * write out the header of the report's content
+    * @param bw the writer to use
+    * @throws IOException if an errror occurs
+    */
+   @Override
+   void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
+   {
+      bw.write("<body>" + Dump.NEW_LINE);
+      bw.write(Dump.NEW_LINE);
+
+      bw.write("<h1>" + NAME + "</h1>" + Dump.NEW_LINE);
+
+      bw.write("<a href=\"../index.html\">Main</a>" + Dump.NEW_LINE);
+      bw.write("<p>" + Dump.NEW_LINE);
+
+   }
 
    /**
     * write out the report's content
     * @param bw the writer to use
     * @exception IOException if an error occurs
     */
+   @Override
    void writeHtmlBodyContent(BufferedWriter bw) throws IOException
    {
       bw.write("<table>" + Dump.NEW_LINE);
 
       bw.write("  <tr>" + Dump.NEW_LINE);
-      bw.write("     <th>Class</th>" + Dump.NEW_LINE);
+      bw.write("     <th>Package</th>" + Dump.NEW_LINE);
       bw.write("     <th>Depends On</th>" + Dump.NEW_LINE);
       bw.write("  </tr>" + Dump.NEW_LINE);
 
@@ -83,35 +104,35 @@ public class ClassDependsOnReport extends CLSReport
       {
          if (archive.getType() == ArchiveTypes.JAR)
          {
-            SortedMap<String, SortedSet<String>> classDependencies = archive.getClassDependencies();
-
-            Iterator<Map.Entry<String, SortedSet<String>>> dit = classDependencies.entrySet().iterator();
+            SortedMap<String, SortedSet<String>> packageDependencies = archive.getPackageDependencies();
+            Iterator<Map.Entry<String, SortedSet<String>>> dit = packageDependencies.entrySet().iterator();
             while (dit.hasNext())
             {
                Map.Entry<String, SortedSet<String>> entry = dit.next();
-               String clz = entry.getKey();
-               SortedSet<String> deps = entry.getValue();
+               String pack = entry.getKey();
+               SortedSet<String> packDeps = entry.getValue();
 
                SortedSet<String> newDeps = new TreeSet<String>();
-               
-               for (String dep : deps)
+
+               for (String dep : packDeps)
                {
-                  if (!dep.equals(clz))
+                  if (!dep.equals(pack))
                      newDeps.add(dep);
                }
 
-               result.put(clz, newDeps);
+               result.put(pack, newDeps);
             }
+
+
          }
       }
-
       Iterator<Map.Entry<String, SortedSet<String>>> rit = result.entrySet().iterator();
 
       while (rit.hasNext())
       {
          Map.Entry<String, SortedSet<String>> entry = rit.next();
-         String clz = entry.getKey();
-         SortedSet<String> deps = entry.getValue();
+         String pack = entry.getKey();
+         SortedSet<String> packDeps = entry.getValue();
 
          if (odd)
          {
@@ -121,10 +142,10 @@ public class ClassDependsOnReport extends CLSReport
          {
             bw.write("  <tr class=\"roweven\">" + Dump.NEW_LINE);
          }
-         bw.write("     <td>" + clz + "</a></td>" + Dump.NEW_LINE);
+         bw.write("     <td>" + pack + "</a></td>" + Dump.NEW_LINE);
          bw.write("     <td>");
 
-         Iterator<String> sit = deps.iterator();
+         Iterator<String> sit = packDeps.iterator();
          while (sit.hasNext())
          {
             String dep = sit.next();
@@ -136,26 +157,11 @@ public class ClassDependsOnReport extends CLSReport
 
          bw.write("</td>" + Dump.NEW_LINE);
          bw.write("  </tr>" + Dump.NEW_LINE);
-         
+
          odd = !odd;
       }
 
       bw.write("</table>" + Dump.NEW_LINE);
-   }
 
-   /**
-    * write out the header of the report's content
-    * @param bw the writer to use
-    * @throws IOException if an error occurs
-    */
-   void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
-   {
-      bw.write("<body>" + Dump.NEW_LINE);
-      bw.write(Dump.NEW_LINE);
-
-      bw.write("<h1>" + NAME + "</h1>" + Dump.NEW_LINE);
-
-      bw.write("<a href=\"../index.html\">Main</a>" + Dump.NEW_LINE);
-      bw.write("<p>" + Dump.NEW_LINE);
    }
 }

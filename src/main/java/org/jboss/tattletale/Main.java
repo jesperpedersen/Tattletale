@@ -42,6 +42,8 @@ import org.jboss.tattletale.reporting.MultipleJarsReport;
 import org.jboss.tattletale.reporting.MultipleLocationsReport;
 import org.jboss.tattletale.reporting.NoVersionReport;
 import org.jboss.tattletale.reporting.OSGiReport;
+import org.jboss.tattletale.reporting.PackageDependantsReport;
+import org.jboss.tattletale.reporting.PackageDependsOnReport;
 import org.jboss.tattletale.reporting.PackageMultipleJarsReport;
 import org.jboss.tattletale.reporting.Report;
 import org.jboss.tattletale.reporting.ReportSeverity;
@@ -804,7 +806,7 @@ public class Main
     *           Where the reports go
     * @param config
     *           Tattletale runtime properties.
-    * @param allReport
+    * @param allReports
     *           Should all reports be generated ?
     * @param reportSet
     *           The set of reports that should be generated
@@ -876,6 +878,27 @@ public class Main
 
          dependants.generate(outputDir);
          dependenciesReports.add(dependants);
+      }
+
+      Report packageDependsOn = new PackageDependsOnReport(archives, known, classloaderStructure);
+      if (allReports || reportSet.contains(packageDependsOn.getId()))
+      {
+         if (filters != null && filters.getProperty(packageDependsOn.getId()) != null)
+            packageDependsOn.setFilter(filters.getProperty(packageDependsOn.getId()));
+
+         packageDependsOn.generate(outputDir);
+         dependenciesReports.add(packageDependsOn);
+      }
+
+      Report packageDependants = new PackageDependantsReport(archives, known, classloaderStructure);
+      if (allReports || reportSet.contains((packageDependants.getId())))
+      {
+         if (filters != null && filters.getProperty(packageDependants.getId()) != null)
+            packageDependants.setFilter(filters.getProperty(packageDependants.getId()));
+
+         packageDependants.generate(outputDir);
+         dependenciesReports.add(packageDependants);
+
       }
 
       Report transitiveDependsOn = new TransitiveDependsOnReport(archives,
