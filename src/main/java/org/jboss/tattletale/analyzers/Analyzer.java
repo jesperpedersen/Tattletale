@@ -22,40 +22,35 @@
 
 package org.jboss.tattletale.analyzers;
 
-import org.jboss.tattletale.core.Archive;
-
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 
 /**
- * Interface that will be used on the top level in order to scan different archive types (.jar, .war, .ear etc).
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * Class used to figure out if a given file would be a .jar, .war and then return the appropriate implementation of
+ * {@link ArchiveScanner}
+ *
  * @author Navin Surtani
  * */
-public interface ArchiveScanner
+public class Analyzer
 {
    /**
-    * Scan an archive
-    *
-    * @param file The file
-    * @return The archive
+    * Returns the appropriate scanner implementation based on the type of file that is passed as a parameter.
+    * @param file - the .jar, .war file etc.
+    * @return the implementation of {@link ArchiveScanner}
     */
-   public Archive scan(File file);
-
-   /**
-    * Scan an archive
-    *
-    * @param file        The file
-    * @param gProvides   The global provides map
-    * @param known       The set of known archives
-    * @param blacklisted The set of black listed packages
-    * @return The archive
-    */
-
-   public Archive scan(File file, Map<String, SortedSet<String>> gProvides,
-                              List<Archive> known, Set<String> blacklisted);
+   public ArchiveScanner getScanner(File file)
+   {
+      if (file.getName().contains(".jar"))
+      {
+         return new JarScanner();
+      }
+      else if (file.getName().contains(".war"))
+      {
+         return new WarScanner();
+      }
+      else
+      {
+         throw new IllegalArgumentException("The file parameter passed does not have the correct file extension.");
+      }
+   }
 
 }

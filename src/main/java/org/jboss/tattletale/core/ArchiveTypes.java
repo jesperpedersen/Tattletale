@@ -31,6 +31,9 @@ public class ArchiveTypes
    /** JAR */
    public static final int JAR = 0;
 
+   /** WAR */
+   public static final int WAR = 1;
+
    /** Constructor */
    private ArchiveTypes()
    {

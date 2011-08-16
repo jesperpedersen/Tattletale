@@ -21,6 +21,7 @@
  */
 package org.jboss.tattletale;
 
+import org.jboss.tattletale.analyzers.Analyzer;
 import org.jboss.tattletale.analyzers.ArchiveScanner;
 import org.jboss.tattletale.analyzers.DirectoryScanner;
 import org.jboss.tattletale.core.Archive;
@@ -156,7 +157,7 @@ public class Main
       this.failOnWarn = false;
       this.failOnError = false;
       this.reports = null;
-      this.scan = ".jar";
+      this.scan = ".jar,.war";
 
       this.dependencyReports = new ArrayList<Class>();
       addDependencyReport(ClassDependsOnReport.class);
@@ -539,7 +540,7 @@ public class Main
       }
       else
       {
-         DirectoryScanner.setArchives(".jar");
+         DirectoryScanner.setArchives(".jar, .war");
       }
 
       Map<String, SortedSet<Location>> locationsMap = new HashMap<String, SortedSet<Location>>();
@@ -569,10 +570,13 @@ public class Main
          if (f.isDirectory())
          {
             List<File> fileList = DirectoryScanner.scan(f, excludeSet);
+            Analyzer analyzer = new Analyzer();
 
             for (File file : fileList)
             {
-               Archive archive = ArchiveScanner.scan(file, gProvides, known, blacklistedSet);
+               ArchiveScanner scanner = analyzer.getScanner(file);
+               Archive archive = scanner.scan(file, gProvides, known, blacklistedSet);
+
 
                if (archive != null)
                {
