@@ -22,9 +22,7 @@
 
 package org.jboss.tattletale.analyzers;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.jboss.tattletale.core.Archive;
-import org.jboss.tattletale.core.JarArchive;
 import org.jboss.tattletale.core.Location;
 import org.jboss.tattletale.core.WarArchive;
 
@@ -53,17 +51,20 @@ import java.util.jar.Manifest;
  * @author Navin Surtani
  */
 
-public class WarScanner extends JarScanner
+public class WarScanner extends AbstractScanner
 {
-   @Override
+   public Archive scan(File file)
+   {
+      return scan(file, null, null, null);
+   }
+
    public Archive scan(File file, Map<String, SortedSet<String>> gProvides, List<Archive> known,
                        Set<String> blacklisted)
    {
       WarArchive warArchive = null;
       JarFile jarFile = null;
-      List<JarArchive> jarArchiveList= new ArrayList<JarArchive>();
-      // This archive will be checked if it is a JarArchive. If it is then it will be added to the list.
-      Archive scannedArchive = null;
+      List<Archive> subArchiveList= new ArrayList<Archive>();
+      JarScanner jarScanner = new JarScanner();
 
       try
       {
@@ -155,11 +156,7 @@ public class WarScanner extends JarScanner
             else if (entryName.endsWith(".jar"))
             {
                // We have a JAR file so we are going to make the scan call on the JAR superclass and then return it.
-               scannedArchive = scan(file, gProvides, known, blacklisted);
-               if (scannedArchive instanceof JarArchive)
-               {
-                  jarArchiveList.add((JarArchive) scannedArchive);
-               }
+               subArchiveList.add(jarScanner.scan(file, gProvides, known, blacklisted));
             }
          }
          if (provides.size() == 0)
@@ -180,7 +177,7 @@ public class WarScanner extends JarScanner
          Location location = new Location(file.getCanonicalPath(), version);
 
          warArchive = new WarArchive(file.getName(), classVersion, lManifest, lSign, requires, provides,
-               classDependencies, packageDependencies, blacklistedDependencies, location, jarArchiveList);
+               classDependencies, packageDependencies, blacklistedDependencies, location, subArchiveList);
 
          super.addProfilesToArchive(warArchive, profiles);
          Iterator<String> it = provides.keySet().iterator();

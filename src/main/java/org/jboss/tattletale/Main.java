@@ -576,8 +576,6 @@ public class Main
             {
                ArchiveScanner scanner = analyzer.getScanner(file);
                Archive archive = scanner.scan(file, gProvides, known, blacklistedSet);
-
-
                if (archive != null)
                {
                   SortedSet<Location> locations = locationsMap.get(archive.getName());
@@ -1147,7 +1145,7 @@ public class Main
     * This helper class generates reports from report definitions and gathers
     * report definitions into a SortedSet which can be used to build the index.
     *
-    * @author MikeMoore
+    * @author Mike Moore
     */
    private class ReportSetBuilder
    {

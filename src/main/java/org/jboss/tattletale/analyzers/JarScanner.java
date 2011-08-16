@@ -53,7 +53,7 @@ import java.util.jar.Manifest;
  * @author Jesper Pedersen <jesper.pedersen@jboss.org>
  * @author Navin Surtani
  */
-public class JarScanner implements ArchiveScanner
+public class JarScanner extends AbstractScanner
 {
 
    /**
@@ -240,96 +240,4 @@ public class JarScanner implements ArchiveScanner
       return archive;
    }
 
-   /**
-    * Read the manifest
-    *
-    * @param manifest The manifest
-    * @return The manifest as strings
-    */
-   protected List<String> readManifest(Manifest manifest)
-   {
-      List<String> result = new ArrayList<String>();
-
-      try
-      {
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         manifest.write(baos);
-
-         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-         InputStreamReader isr = new InputStreamReader(bais);
-         LineNumberReader lnr = new LineNumberReader(isr);
-
-         String s = lnr.readLine();
-         while (s != null)
-         {
-            result.add(s);
-            s = lnr.readLine();
-         }
-      }
-      catch (IOException ioe)
-      {
-         // Ignore
-      }
-
-      return result;
-   }
-
-   /**
-    * Returns the version as a String once read from the manifest.
-    *
-    * @param manifest - the manifest obtained from the JarFile
-    * @return - the version as a String.
-    */
-   protected String versionFromManifest(Manifest manifest)
-   {
-
-      Attributes mainAttributes = manifest.getMainAttributes();
-      String version = mainAttributes.getValue("Specification-Version");
-      if (version == null)
-      {
-         version = mainAttributes.getValue("Implementation-Version");
-      }
-      if (version == null)
-      {
-         version = mainAttributes.getValue("Version");
-      }
-
-      if (version == null && manifest.getEntries() != null)
-      {
-         Iterator ait = manifest.getEntries().values().iterator();
-         while (version == null && ait.hasNext())
-         {
-            Attributes attributes = (Attributes) ait.next();
-
-            version = attributes.getValue("Specification-Version");
-            if (version == null)
-            {
-               version = attributes.getValue("Implementation-Version");
-            }
-            if (version == null)
-            {
-               version = attributes.getValue("Version");
-            }
-         }
-      }
-      return version;
-   }
-
-   /**
-    * Method that will add a set of profiles (Strings) to the archive.
-    *
-    * @param archive - the archive
-    * @param profiles - the set of Strings.
-    */
-
-   protected void addProfilesToArchive(Archive archive, SortedSet<String> profiles)
-   {
-      if (profiles.size() > 0)
-      {
-         for (String profile : profiles)
-         {
-            archive.addProfile(profile);
-         }
-      }
-   }
 }

@@ -31,9 +31,8 @@ import java.util.SortedSet;
  *
  * @author Navin Surtani
  */
-public class WarArchive extends Archive
+public class WarArchive extends NestableArchive
 {
-   private List<JarArchive> jarArchiveList = null;
 
    /**
     * Constructor
@@ -53,12 +52,10 @@ public class WarArchive extends Archive
                      SortedSet<String> requires, SortedMap<String, Long> provides, SortedMap<String,
                      SortedSet<String>> classDependencies, SortedMap<String, SortedSet<String>> packageDependencies,
                      SortedMap<String, SortedSet<String>> blacklistedDependencies, Location location,
-                     List<JarArchive> jarArchiveList)
+                     List<Archive> subArchives)
    {
       super(ArchiveTypes.WAR, name, version, manifest, sign, requires, provides, classDependencies,
-            packageDependencies, blacklistedDependencies, location);
-      this.jarArchiveList = jarArchiveList;
-
+            packageDependencies, blacklistedDependencies, location, subArchives);
    }
 
 
