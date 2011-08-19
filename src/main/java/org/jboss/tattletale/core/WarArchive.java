@@ -47,6 +47,7 @@ public class WarArchive extends NestableArchive
     * @param packageDependencies     The package dependencies
     * @param blacklistedDependencies The blacklisted dependencies
     * @param location                The location
+    * @param subArchives             The list of subsidiary archives as prescribed by {@link NestableArchive]}
     */
    public WarArchive(String name, int version, List<String> manifest, List<String> sign,
                      SortedSet<String> requires, SortedMap<String, Long> provides, SortedMap<String,

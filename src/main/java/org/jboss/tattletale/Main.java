@@ -27,6 +27,7 @@ import org.jboss.tattletale.analyzers.DirectoryScanner;
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.ArchiveTypes;
 import org.jboss.tattletale.core.Location;
+import org.jboss.tattletale.core.NestableArchive;
 import org.jboss.tattletale.reporting.BlackListedReport;
 import org.jboss.tattletale.reporting.CircularDependencyReport;
 import org.jboss.tattletale.reporting.ClassDependantsReport;
@@ -70,6 +71,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -948,13 +950,7 @@ public class Main
       SortedSet<Report> customReportSet = reportSetBuilder.getReportSet();
       reportSetBuilder.clear();
 
-      for (Archive a : archives)
-      {
-         if (a.getType() == ArchiveTypes.JAR)
-         {
-            reportSetBuilder.addReport(new JarReport(a));
-         }
-      }
+      addJarReports(archives, reportSetBuilder);
 
       SortedSet<Report> archiveReports = reportSetBuilder.getReportSet();
 
@@ -1017,6 +1013,30 @@ public class Main
    }
 
    /**
+    * Add the JAR reports based on the archive that we have. Essentially a recursive method in order to check for
+    * calls that could be made on a {@link NestableArchive}
+    *
+    * @param archives - the collection of Archives.
+    * @param reportSetBuilder - the Report Set Builder required to add a new JarReport if there is a JarArchive found.
+    */
+
+   private void addJarReports(Collection<Archive> archives, ReportSetBuilder reportSetBuilder)
+   {
+      for (Archive a : archives)
+      {
+         if (a.getType() == ArchiveTypes.JAR)
+         {
+            reportSetBuilder.addReport(new JarReport(a));
+         }
+         else if (a instanceof NestableArchive)
+         {
+            NestableArchive nestableArchive = (NestableArchive) a;
+            addJarReports(nestableArchive.getSubArchives(), reportSetBuilder);
+         }
+      }
+   }
+
+   /**
     * The main method
     *
     * @param args The arguments
@@ -1054,6 +1074,7 @@ public class Main
          usage();
       }
    }
+
 
    /**
     * This helper class checks reports to determine whether they should fail,

@@ -53,17 +53,32 @@ import java.util.jar.Manifest;
 
 public class WarScanner extends AbstractScanner
 {
+   /**
+    * Scan a .war archive
+    *
+    * @param file The file
+    * @return The archive
+    */
    public Archive scan(File file)
    {
       return scan(file, null, null, null);
    }
 
+   /**
+    * Scan a .war archive
+    *
+    * @param file        The file
+    * @param gProvides   The global provides map
+    * @param known       The set of known archives
+    * @param blacklisted The set of black listed packages
+    * @return The archive
+    */
    public Archive scan(File file, Map<String, SortedSet<String>> gProvides, List<Archive> known,
                        Set<String> blacklisted)
    {
       WarArchive warArchive = null;
       JarFile jarFile = null;
-      List<Archive> subArchiveList= new ArrayList<Archive>();
+      List<Archive> subArchiveList = new ArrayList<Archive>();
       JarScanner jarScanner = new JarScanner();
 
       try
