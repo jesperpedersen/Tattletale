@@ -40,6 +40,7 @@ import java.util.TreeSet;
  */
 public class DependantsReport extends CLSReport
 {
+
    /** NAME */
    private static final String NAME = "Dependants";
 
@@ -78,8 +79,12 @@ public class DependantsReport extends CLSReport
 
       for (Archive archive : archives)
       {
-
-         if (archive.getType() == ArchiveTypes.JAR)
+         if (archive instanceof NestableArchive)
+         {
+            NestableArchive nestableArchive = (NestableArchive) archive;
+            recursivelyWriteContent(bw, nestableArchive.getSubArchives());
+         }
+         else
          {
             if (odd)
             {
@@ -140,14 +145,7 @@ public class DependantsReport extends CLSReport
 
             odd = !odd;
          }
-         else if (archive instanceof NestableArchive)
-         {
-            NestableArchive nestableArchive = (NestableArchive) archive;
-            recursivelyWriteContent(bw, nestableArchive.getSubArchives());
-         }
       }
-
-
    }
 
 
@@ -155,7 +153,7 @@ public class DependantsReport extends CLSReport
     * write out the header of the report's content
     *
     * @param bw the writer to use
-    * @throws IOException if an errror occurs
+    * @throws IOException if an error occurs
     */
    protected void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
    {

@@ -140,7 +140,14 @@ public class PackageDependsOnReport extends CLSReport
       SortedMap<String, SortedSet<String>> result = new TreeMap<String, SortedSet<String>>();
       for (Archive archive : archives)
       {
-         if (archive.getType() == ArchiveTypes.JAR)
+         if (archive instanceof NestableArchive)
+         {
+            NestableArchive nestableArchive = (NestableArchive) archive;
+            SortedMap<String, SortedSet<String>> subResult = recursivelyBuildResultFromArchive(nestableArchive
+                  .getSubArchives());
+            result.putAll(subResult);
+         }
+         else
          {
             SortedMap<String, SortedSet<String>> packageDependencies = archive.getPackageDependencies();
             Iterator<Map.Entry<String, SortedSet<String>>> dit = packageDependencies.entrySet().iterator();
@@ -160,13 +167,6 @@ public class PackageDependsOnReport extends CLSReport
 
                result.put(pack, newDeps);
             }
-         }
-         else if (archive instanceof NestableArchive)
-         {
-            NestableArchive nestableArchive = (NestableArchive) archive;
-            SortedMap<String, SortedSet<String>> subResult = recursivelyBuildResultFromArchive(nestableArchive
-                  .getSubArchives());
-            result.putAll(subResult);
          }
       }
       return result;

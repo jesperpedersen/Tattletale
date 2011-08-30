@@ -75,7 +75,12 @@ public class BlackListedReport extends AbstractReport
 
       for (Archive archive : archives)
       {
-         if (archive.getType() == ArchiveTypes.JAR)
+         if (archive instanceof NestableArchive)
+         {
+            NestableArchive nestableArchive = (NestableArchive) archive;
+            recursivelyWriteContent(bw, nestableArchive.getSubArchives());
+         }
+         else
          {
             boolean include = false;
             boolean filtered = isFiltered(archive.getName());
@@ -143,11 +148,6 @@ public class BlackListedReport extends AbstractReport
 
                odd = !odd;
             }
-         }
-         else if (archive instanceof NestableArchive)
-         {
-            NestableArchive nestableArchive = (NestableArchive) archive;
-            recursivelyWriteContent(bw, nestableArchive.getSubArchives());
          }
       }
 

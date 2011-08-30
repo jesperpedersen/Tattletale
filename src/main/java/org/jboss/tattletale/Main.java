@@ -572,6 +572,7 @@ public class Main
          if (f.isDirectory())
          {
             List<File> fileList = DirectoryScanner.scan(f, excludeSet);
+            System.out.println("File list is: " + fileList);
             Analyzer analyzer = new Analyzer();
 
             for (File file : fileList)
@@ -604,6 +605,7 @@ public class Main
                   a.addLocation(l);
                }
             }
+
          }
       }
 
@@ -1024,14 +1026,15 @@ public class Main
    {
       for (Archive a : archives)
       {
-         if (a.getType() == ArchiveTypes.JAR)
-         {
-            reportSetBuilder.addReport(new JarReport(a));
-         }
-         else if (a instanceof NestableArchive)
+
+         if (a instanceof NestableArchive)
          {
             NestableArchive nestableArchive = (NestableArchive) a;
             addJarReports(nestableArchive.getSubArchives(), reportSetBuilder);
+         }
+         else if (a.getType() == ArchiveTypes.JAR)
+         {
+            reportSetBuilder.addReport(new JarReport(a));
          }
       }
    }

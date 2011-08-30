@@ -79,10 +79,16 @@ public class DependsOnReport extends CLSReport
    {
       boolean odd = true;
 
+
       for (Archive archive : archives)
       {
 
-         if (archive.getType() == ArchiveTypes.JAR)
+         if (archive instanceof NestableArchive)
+         {
+            NestableArchive nestableArchive = (NestableArchive) archive;
+            recursivelyWriteContent(bw, nestableArchive.getSubArchives());
+         }
+         else
          {
             if (odd)
             {
@@ -172,11 +178,6 @@ public class DependsOnReport extends CLSReport
             bw.write("  </tr>" + Dump.newLine());
 
             odd = !odd;
-         }
-         else if (archive instanceof NestableArchive)
-         {
-            NestableArchive nestableArchive = (NestableArchive) archive;
-            recursivelyWriteContent(bw, nestableArchive.getSubArchives());
          }
       }
    }

@@ -123,10 +123,16 @@ public class PackageDependantsReport extends CLSReport
 
       for (Archive archive : archives)
       {
-         if (archive.getType() == ArchiveTypes.JAR)
+         if (archive instanceof NestableArchive)
+         {
+            NestableArchive nestableArchive = (NestableArchive) archive;
+            SortedMap<String, SortedSet<String>> subResult = recursivelyBuildResultFromArchive(nestableArchive
+                  .getSubArchives());
+            result.putAll(subResult);
+         }
+         else
          {
             SortedMap<String, SortedSet<String>> packageDependencies = archive.getPackageDependencies();
-
             Iterator<Map.Entry<String, SortedSet<String>>> dit = packageDependencies.entrySet().iterator();
             while (dit.hasNext())
             {
@@ -166,13 +172,6 @@ public class PackageDependantsReport extends CLSReport
                   }
                }
             }
-         }
-         else if (archive instanceof NestableArchive)
-         {
-            NestableArchive nestableArchive = (NestableArchive) archive;
-            SortedMap<String, SortedSet<String>> subResult = recursivelyBuildResultFromArchive(nestableArchive
-                  .getSubArchives());
-            result.putAll(subResult);
          }
       }
       return result;

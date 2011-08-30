@@ -23,6 +23,7 @@
 package org.jboss.tattletale.analyzers;
 
 import org.jboss.tattletale.core.Archive;
+import org.jboss.tattletale.core.JarArchive;
 import org.jboss.tattletale.core.Location;
 import org.jboss.tattletale.core.WarArchive;
 
@@ -77,9 +78,9 @@ public class WarScanner extends AbstractScanner
                        Set<String> blacklisted)
    {
       WarArchive warArchive = null;
-      JarFile jarFile = null;
+      JarFile warFile = null;
       List<Archive> subArchiveList = new ArrayList<Archive>();
-      JarScanner jarScanner = new JarScanner();
+      ArchiveScanner jarScanner = new JarScanner();
 
       try
       {
@@ -91,20 +92,20 @@ public class WarScanner extends AbstractScanner
          SortedMap<String, SortedSet<String>> packageDependencies = new TreeMap<String, SortedSet<String>>();
          SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
          List<String> lSign = null;
-         jarFile = new JarFile(file);
-         Enumeration<JarEntry> e = jarFile.entries();
+         warFile = new JarFile(file);
+         Enumeration<JarEntry> e = warFile.entries();
 
          while (e.hasMoreElements())
          {
-            JarEntry jarEntry = e.nextElement();
-            String entryName = jarEntry.getName();
+            JarEntry warEntry = e.nextElement();
+            String entryName = warEntry.getName();
             InputStream is = null;
 
             if (entryName.endsWith(".class"))
             {
                try
                {
-                  is = jarFile.getInputStream(jarEntry);
+                  is = warFile.getInputStream(warEntry);
                   classVersion = ClassScanner.scan(is, blacklisted, known, classVersion, provides, requires, profiles,
                         classDependencies, packageDependencies, blacklistedDependencies);
                }
@@ -127,12 +128,12 @@ public class WarScanner extends AbstractScanner
                   }
                }
             }
-            else if (jarEntry.getName().contains("META-INF") && jarEntry.getName().endsWith(".SF"))
+            else if (warEntry.getName().contains("META-INF") && warEntry.getName().endsWith(".SF"))
             {
                is = null;
                try
                {
-                  is = jarFile.getInputStream(jarEntry);
+                  is = warFile.getInputStream(warEntry);
 
                   InputStreamReader isr = new InputStreamReader(is);
                   LineNumberReader lnr = new LineNumberReader(isr);
@@ -171,7 +172,8 @@ public class WarScanner extends AbstractScanner
             else if (entryName.endsWith(".jar"))
             {
                // We have a JAR file so we are going to make the scan call on the JAR superclass and then return it.
-               subArchiveList.add(jarScanner.scan(file, gProvides, known, blacklisted));
+               Archive jarArchive = jarScanner.scan(file, gProvides, known, blacklisted);
+               subArchiveList.add(jarArchive);
             }
          }
          if (provides.size() == 0)
@@ -181,7 +183,7 @@ public class WarScanner extends AbstractScanner
 
          String version = null;
          List<String> lManifest = null;
-         Manifest manifest = jarFile.getManifest();
+         Manifest manifest = warFile.getManifest();
 
          if (manifest != null)
          {
@@ -226,9 +228,9 @@ public class WarScanner extends AbstractScanner
       {
          try
          {
-            if (jarFile != null)
+            if (warFile != null)
             {
-               jarFile.close();
+               warFile.close();
             }
          }
          catch (IOException ioe)
