@@ -154,7 +154,6 @@ public class WarScanner extends AbstractScanner
             }
             else if (entryName.endsWith(".jar"))
             {
-               System.out.println("Entry name is: " + entryName);
                File jarFile = Extractor.extract(inputStream, warEntry);
                FileInputStream jarStream = new FileInputStream(jarFile);
                String jarPath = jarFile.getCanonicalPath();
