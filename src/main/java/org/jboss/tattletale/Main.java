@@ -358,6 +358,7 @@ public class Main
     */
    public void execute() throws Exception
    {
+
       Properties config = null;
       Properties filters = null;
 
@@ -572,13 +573,15 @@ public class Main
          if (f.isDirectory())
          {
             List<File> fileList = DirectoryScanner.scan(f, excludeSet);
-            System.out.println("File list is: " + fileList);
             Analyzer analyzer = new Analyzer();
 
             for (File file : fileList)
             {
                ArchiveScanner scanner = analyzer.getScanner(file);
-               Archive archive = scanner.scan(file, gProvides, known, blacklistedSet);
+               FileInputStream fis = new FileInputStream(file);
+               String name = file.getName();
+               String canonicalPath = file.getCanonicalPath();
+               Archive archive = scanner.scan(fis, name, canonicalPath, gProvides, known, blacklistedSet);
                if (archive != null)
                {
                   SortedSet<Location> locations = locationsMap.get(archive.getName());

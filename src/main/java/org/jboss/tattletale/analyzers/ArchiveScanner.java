@@ -25,6 +25,8 @@ package org.jboss.tattletale.analyzers;
 import org.jboss.tattletale.core.Archive;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,22 +42,20 @@ public interface ArchiveScanner
    /**
     * Scan an archive
     *
-    * @param file The file
     * @return The archive
     */
-   public Archive scan(File file);
+   public Archive scan(InputStream is, String name, String canonicalPath) throws IOException;
 
    /**
     * Scan an archive
     *
-    * @param file        The file
     * @param gProvides   The global provides map
     * @param known       The set of known archives
     * @param blacklisted The set of black listed packages
     * @return The archive
     */
 
-   public Archive scan(File file, Map<String, SortedSet<String>> gProvides,
-                              List<Archive> known, Set<String> blacklisted);
+   public Archive scan(InputStream is, String name, String canonicalPath, Map<String, SortedSet<String>> gProvides,
+                              List<Archive> known, Set<String> blacklisted) throws IOException;
 
 }

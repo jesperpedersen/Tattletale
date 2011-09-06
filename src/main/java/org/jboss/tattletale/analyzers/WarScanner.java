@@ -23,11 +23,11 @@
 package org.jboss.tattletale.analyzers;
 
 import org.jboss.tattletale.core.Archive;
-import org.jboss.tattletale.core.JarArchive;
 import org.jboss.tattletale.core.Location;
 import org.jboss.tattletale.core.WarArchive;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,6 +44,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 /**
@@ -57,33 +58,34 @@ public class WarScanner extends AbstractScanner
    /**
     * Scan a .war archive
     *
-    * @param file The file
     * @return The archive
     */
-   public Archive scan(File file)
+   public Archive scan(InputStream inputStream, String name, String canonicalPath)
    {
-      return scan(file, null, null, null);
+      return scan(inputStream, name, canonicalPath, null, null, null);
    }
 
    /**
     * Scan a .war archive
     *
-    * @param file        The file
     * @param gProvides   The global provides map
     * @param known       The set of known archives
     * @param blacklisted The set of black listed packages
     * @return The archive
     */
-   public Archive scan(File file, Map<String, SortedSet<String>> gProvides, List<Archive> known,
+   public Archive scan(InputStream inputStream, String name, String canonicalPath, Map<String, SortedSet<String>> gProvides,
+                       List<Archive> known,
                        Set<String> blacklisted)
    {
+
+      System.out.println("Name passed to war scanner is: " + name);
       WarArchive warArchive = null;
-      JarFile warFile = null;
       List<Archive> subArchiveList = new ArrayList<Archive>();
       ArchiveScanner jarScanner = new JarScanner();
-
+      JarFile warFile = null;
       try
       {
+         warFile = new JarFile(name);
          Integer classVersion = null;
          SortedSet<String> requires = new TreeSet<String>();
          SortedMap<String, Long> provides = new TreeMap<String, Long>();
@@ -92,45 +94,27 @@ public class WarScanner extends AbstractScanner
          SortedMap<String, SortedSet<String>> packageDependencies = new TreeMap<String, SortedSet<String>>();
          SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
          List<String> lSign = null;
-         warFile = new JarFile(file);
-         Enumeration<JarEntry> e = warFile.entries();
+         Enumeration<JarEntry> warEntries = warFile.entries();
 
-         while (e.hasMoreElements())
+         while (warEntries.hasMoreElements())
          {
-            JarEntry warEntry = e.nextElement();
+            JarEntry warEntry = warEntries.nextElement();
             String entryName = warEntry.getName();
-            InputStream is = null;
-
             if (entryName.endsWith(".class"))
             {
                try
                {
-                  is = warFile.getInputStream(warEntry);
-                  classVersion = ClassScanner.scan(is, blacklisted, known, classVersion, provides, requires, profiles,
+                  classVersion = ClassScanner.scan(inputStream, blacklisted, known, classVersion, provides, requires, profiles,
                         classDependencies, packageDependencies, blacklistedDependencies);
                }
                catch (Exception openException)
                {
                   // Ignore
                }
-               finally
-               {
-                  try
-                  {
-                     if (is != null)
-                     {
-                        is.close();
-                     }
-                  }
-                  catch (Exception closeException)
-                  {
-                     // No op.
-                  }
-               }
             }
-            else if (warEntry.getName().contains("META-INF") && warEntry.getName().endsWith(".SF"))
+            else if (entryName.contains("META-INF") && entryName.endsWith(".SF"))
             {
-               is = null;
+               InputStream is = null;
                try
                {
                   is = warFile.getInputStream(warEntry);
@@ -171,11 +155,15 @@ public class WarScanner extends AbstractScanner
             }
             else if (entryName.endsWith(".jar"))
             {
-               // We have a JAR file so we are going to make the scan call on the JAR superclass and then return it.
-               Archive jarArchive = jarScanner.scan(file, gProvides, known, blacklisted);
+               System.out.println("Found a jar file");
+               File jarFile = Extractor.extract(inputStream, warEntry);
+               FileInputStream jarStream = new FileInputStream(jarFile);
+               String jarPath = jarFile.getCanonicalPath();
+               Archive jarArchive = jarScanner.scan(jarStream, jarPath, jarPath, gProvides, known, blacklisted);
                subArchiveList.add(jarArchive);
             }
          }
+         System.out.println("Sub archives are: " + subArchiveList.toString());
          if (provides.size() == 0)
          {
             return null;
@@ -191,9 +179,9 @@ public class WarScanner extends AbstractScanner
             lManifest = super.readManifest(manifest);
          }
 
-         Location location = new Location(file.getCanonicalPath(), version);
+         Location location = new Location(canonicalPath, version);
 
-         warArchive = new WarArchive(file.getName(), classVersion, lManifest, lSign, requires, provides,
+         warArchive = new WarArchive(name, classVersion, lManifest, lSign, requires, provides,
                classDependencies, packageDependencies, blacklistedDependencies, location, subArchiveList);
 
          super.addProfilesToArchive(warArchive, profiles);
@@ -238,6 +226,11 @@ public class WarScanner extends AbstractScanner
             // Ignore
          }
       }
+      if (warArchive == null)
+      {
+      System.out.println("I've still got an NPE here haven't I?");
+      }
+
       return warArchive;
    }
 

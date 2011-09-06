@@ -42,6 +42,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 /**
@@ -56,33 +57,30 @@ public class JarScanner extends AbstractScanner
    /**
     * Scan an archive
     *
-    * @param file The file
     * @return The archive
     */
-   public Archive scan(File file)
+   public Archive scan(InputStream inputStream, String name, String canonicalPath)
    {
-      return scan(file, null, null, null);
+      return scan(inputStream, name, canonicalPath, null, null, null);
    }
 
    /**
     * Scan an archive
     *
-    * @param file        The file
     * @param gProvides   The global provides map
     * @param known       The set of known archives
     * @param blacklisted The set of black listed packages
     * @return The archive
     */
-   public Archive scan(File file, Map<String, SortedSet<String>> gProvides,
+   public Archive scan(InputStream inputStream, String name, String canonicalPath, Map<String, SortedSet<String>> gProvides,
                               List<Archive> known, Set<String> blacklisted)
    {
+      System.out.println("Hello! JarScanner here!");
       Archive archive = null;
       JarFile jarFile = null;
-
       try
       {
-         String name = file.getName();
-         String filename = file.getCanonicalPath();
+         jarFile = new JarFile(name);
          Integer classVersion = null;
          SortedSet<String> requires = new TreeSet<String>();
          SortedMap<String, Long> provides = new TreeMap<String, Long>();
@@ -90,44 +88,26 @@ public class JarScanner extends AbstractScanner
          SortedMap<String, SortedSet<String>> classDependencies = new TreeMap<String, SortedSet<String>>();
          SortedMap<String, SortedSet<String>> packageDependencies = new TreeMap<String, SortedSet<String>>();
          SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
-
          List<String> lSign = null;
+         Enumeration<JarEntry> jarEntries = jarFile.entries();
 
-         jarFile = new JarFile(file);
-         Enumeration<JarEntry> e = jarFile.entries();
-
-         while (e.hasMoreElements())
+         while(jarEntries.hasMoreElements())
          {
-            JarEntry jarEntry = e.nextElement();
-            if (jarEntry.getName().endsWith(".class"))
+            JarEntry jarEntry = jarEntries.nextElement();
+            String entryName = jarEntry.getName();
+            if (entryName.endsWith(".class"))
             {
-               InputStream is = null;
                try
                {
-                  is = jarFile.getInputStream(jarEntry);
-                  classVersion = ClassScanner.scan(is, blacklisted, known, classVersion, provides, requires, profiles,
-                     classDependencies, packageDependencies, blacklistedDependencies);
+                  classVersion = ClassScanner.scan(inputStream, blacklisted, known, classVersion, provides, requires, profiles,
+                        classDependencies, packageDependencies, blacklistedDependencies);
                }
                catch (Exception ie)
                {
                   // Ignore
                }
-               finally
-               {
-                  try
-                  {
-                     if (is != null)
-                     {
-                        is.close();
-                     }
-                  }
-                  catch (IOException ioe)
-                  {
-                     // Ignore
-                  }
-               }
             }
-            else if (jarEntry.getName().indexOf("META-INF") != -1 && jarEntry.getName().endsWith(".SF"))
+            else if (entryName.contains("META-INF") && entryName.endsWith(".SF"))
             {
                InputStream is = null;
                try
@@ -183,11 +163,10 @@ public class JarScanner extends AbstractScanner
             version = versionFromManifest(manifest);
             lManifest = readManifest(manifest);
          }
-         Location location = new Location(filename, version);
+         Location location = new Location(canonicalPath, version);
 
          archive = new JarArchive(name, classVersion, lManifest, lSign, requires, provides,
                      classDependencies, packageDependencies, blacklistedDependencies, location);
-
          addProfilesToArchive(archive, profiles);
 
          Iterator<String> it = provides.keySet().iterator();
@@ -233,7 +212,7 @@ public class JarScanner extends AbstractScanner
             // Ignore
          }
       }
-
+      System.out.println("Archive is: " + archive);
       return archive;
    }
 
