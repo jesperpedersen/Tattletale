@@ -78,7 +78,6 @@ public class WarScanner extends AbstractScanner
                        Set<String> blacklisted)
    {
 
-      System.out.println("Name passed to war scanner is: " + name);
       WarArchive warArchive = null;
       List<Archive> subArchiveList = new ArrayList<Archive>();
       ArchiveScanner jarScanner = new JarScanner();
@@ -155,7 +154,7 @@ public class WarScanner extends AbstractScanner
             }
             else if (entryName.endsWith(".jar"))
             {
-               System.out.println("Found a jar file");
+               System.out.println("Entry name is: " + entryName);
                File jarFile = Extractor.extract(inputStream, warEntry);
                FileInputStream jarStream = new FileInputStream(jarFile);
                String jarPath = jarFile.getCanonicalPath();
@@ -163,7 +162,6 @@ public class WarScanner extends AbstractScanner
                subArchiveList.add(jarArchive);
             }
          }
-         System.out.println("Sub archives are: " + subArchiveList.toString());
          if (provides.size() == 0)
          {
             return null;
@@ -225,10 +223,6 @@ public class WarScanner extends AbstractScanner
          {
             // Ignore
          }
-      }
-      if (warArchive == null)
-      {
-      System.out.println("I've still got an NPE here haven't I?");
       }
 
       return warArchive;

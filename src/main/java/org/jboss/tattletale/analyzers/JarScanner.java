@@ -75,7 +75,6 @@ public class JarScanner extends AbstractScanner
    public Archive scan(InputStream inputStream, String name, String canonicalPath, Map<String, SortedSet<String>> gProvides,
                               List<Archive> known, Set<String> blacklisted)
    {
-      System.out.println("Hello! JarScanner here!");
       Archive archive = null;
       JarFile jarFile = null;
       try
@@ -212,7 +211,6 @@ public class JarScanner extends AbstractScanner
             // Ignore
          }
       }
-      System.out.println("Archive is: " + archive);
       return archive;
    }
 
