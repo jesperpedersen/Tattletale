@@ -79,15 +79,7 @@ public class JarScanner extends AbstractScanner
       JarFile jarFile = null;
       try
       {
-         File jarPointer = new File(canonicalPath);
-
-         if (jarPointer != null)
-         {
-            throw new NullPointerException("The file that we are trying to use to load is null. Check path of "
-                  + canonicalPath);
-         }
-
-         jarFile = new JarFile(name);
+         jarFile = new JarFile(canonicalPath);
          Integer classVersion = null;
          SortedSet<String> requires = new TreeSet<String>();
          SortedMap<String, Long> provides = new TreeMap<String, Long>();
@@ -97,7 +89,7 @@ public class JarScanner extends AbstractScanner
          SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
          List<String> lSign = null;
          Enumeration<JarEntry> jarEntries = jarFile.entries();
-         System.out.println(jarEntries.toString());
+         System.out.println("Jar Entries are: " + jarEntries.toString());
 
          while(jarEntries.hasMoreElements())
          {
