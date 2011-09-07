@@ -28,7 +28,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Class that would be used in order to obtain .jar files stored within a zipped up .war file.
@@ -39,54 +42,97 @@ import java.util.jar.JarEntry;
 public class Extractor
 {
 
-   /**
-    * Static call that would take in a zipped up file and extract it.
-    *
-    * @param is               - The input stream
-    * @param jarEntry         - The entry within the war/ear archive.
-    * @return A list of Jar files.
-    * @throws IOException     - based on the input stream.
+   /** Extract a JAR type file
+    * @return The root of the extracted JAR file
+    * @exception IOException Thrown if an error occurs
     */
-   public static File extract(InputStream is, JarEntry jarEntry) throws IOException
+   public static File extract(JarFile war) throws IOException
    {
-      if (jarEntry == null)
-      {
-         throw new NullPointerException("The file parameter passed into Extractor is null");
-      }
+      String basedir = System.getProperty("java.io.tmpdir");
+      File target = new File(basedir, "tt_tmp");
 
-      String basePath = System.getProperty("java.io.tmpdir");
-      File targetDir = new File(basePath + "/tt_tmp");
+      if (target.exists())
+      {
+         recursiveDelete(target);
+      }
+      if (!target.mkdirs())
+      {
+         throw new IOException("Could not create " + target);
+      }
+      Enumeration<JarEntry> entries = war.entries();
+      while (entries.hasMoreElements())
+      {
+         JarEntry je = entries.nextElement();
+         File copy = new File(target, je.getName());
 
-      if (targetDir.exists())
-      {
-         recursiveDelete(targetDir);
-      }
-      if (!targetDir.mkdirs())
-      {
-         throw new IOException("Could not create the target directories for: " + targetDir.getCanonicalPath());
-      }
-      File copy = new File(targetDir, jarEntry.getName());
-      if (!copy.getParentFile().mkdirs())
-      {
-         throw new IOException("Could not create parent directory for the jar files.");
-      }
-      BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
-      FileOutputStream fos = new FileOutputStream(copy);
-      BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fos);
+         if (!je.isDirectory())
+         {
+            InputStream in = null;
+            OutputStream out = null;
 
-      byte[] buffer = new byte[4096];
-      for (;;)
-      {
-         int nBytes = bufferedInputStream.read(buffer);
-         if (nBytes <= 0) break;
-         bufferedOutputStream.write(buffer, 0, nBytes);
-      }
-      bufferedOutputStream.flush();
-      bufferedOutputStream.close();
+            // Make sure that the directory is _really_ there
+            if (copy.getParentFile() != null && !copy.getParentFile().exists())
+            {
+               if (!copy.getParentFile().mkdirs())
+                  throw new IOException("Could not create " + copy.getParentFile());
+            }
 
-      return copy;
+            try
+            {
+               in = new BufferedInputStream(war.getInputStream(je));
+               out = new BufferedOutputStream(new FileOutputStream(copy));
+
+               byte[] buffer = new byte[4096];
+               for (;;)
+               {
+                  int nBytes = in.read(buffer);
+                  if (nBytes <= 0)
+                     break;
+
+                  out.write(buffer, 0, nBytes);
+               }
+               out.flush();
+            }
+            finally
+            {
+               try
+               {
+                  if (out != null)
+                     out.close();
+               }
+               catch (IOException ignore)
+               {
+                  // Ignore
+               }
+
+               try
+               {
+                  if (in != null)
+                     in.close();
+               }
+               catch (IOException ignore)
+               {
+                  // Ignore
+               }
+            }
+         }
+         else
+         {
+            if (!copy.exists())
+            {
+               if (!copy.mkdirs())
+                  throw new IOException("Could not create " + copy);
+            }
+            else
+            {
+               if (!copy.isDirectory())
+                  throw new IOException(copy + " isn't a directory");
+            }
+         }
+      }
+      war.close();
+      return target;
    }
-
    private static void recursiveDelete(File file) throws IOException
    {
       if (file != null && file.exists())

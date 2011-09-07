@@ -59,9 +59,9 @@ public class JarScanner extends AbstractScanner
     *
     * @return The archive
     */
-   public Archive scan(InputStream inputStream, String name, String canonicalPath)
+   public Archive scan(File file)
    {
-      return scan(inputStream, name, canonicalPath, null, null, null);
+      return scan(file, null, null, null);
    }
 
    /**
@@ -72,14 +72,17 @@ public class JarScanner extends AbstractScanner
     * @param blacklisted The set of black listed packages
     * @return The archive
     */
-   public Archive scan(InputStream inputStream, String name, String canonicalPath, Map<String, SortedSet<String>> gProvides,
-                              List<Archive> known, Set<String> blacklisted)
+   public Archive scan(File file, Map<String, SortedSet<String>> gProvides, List<Archive> known,
+                       Set<String> blacklisted)
    {
+      System.out.println("Jar Scanner called");
       Archive archive = null;
       JarFile jarFile = null;
+      String name = file.getName();
       try
       {
-         jarFile = new JarFile(canonicalPath);
+         String canonicalPath = file.getCanonicalPath();
+         jarFile = new JarFile(file);
          Integer classVersion = null;
          SortedSet<String> requires = new TreeSet<String>();
          SortedMap<String, Long> provides = new TreeMap<String, Long>();
@@ -89,22 +92,31 @@ public class JarScanner extends AbstractScanner
          SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
          List<String> lSign = null;
          Enumeration<JarEntry> jarEntries = jarFile.entries();
-         System.out.println("Jar Entries are: " + jarEntries.toString());
 
          while(jarEntries.hasMoreElements())
          {
             JarEntry jarEntry = jarEntries.nextElement();
             String entryName = jarEntry.getName();
+            InputStream entryStream = null;
             if (entryName.endsWith(".class"))
             {
                try
                {
-                  classVersion = ClassScanner.scan(inputStream, blacklisted, known, classVersion, provides, requires, profiles,
+                  entryStream = jarFile.getInputStream(jarEntry);
+                  classVersion = scanClasses(entryStream, blacklisted, known, classVersion, provides, requires, profiles,
                         classDependencies, packageDependencies, blacklistedDependencies);
                }
                catch (Exception ie)
                {
-                  // Ignore
+                  System.out.println("Exception of type: " + ie.getClass().toString());
+                  ie.printStackTrace();
+               }
+               finally
+               {
+                  if (entryStream != null)
+                  {
+                     entryStream.close();
+                  }
                }
             }
             else if (entryName.contains("META-INF") && entryName.endsWith(".SF"))

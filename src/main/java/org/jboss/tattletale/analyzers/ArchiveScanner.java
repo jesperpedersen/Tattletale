@@ -42,20 +42,21 @@ public interface ArchiveScanner
    /**
     * Scan an archive
     *
+    * @param file -  The file to be scanned.
     * @return The archive
     */
-   public Archive scan(InputStream is, String name, String canonicalPath) throws IOException;
+   public Archive scan(File file) throws IOException;
 
    /**
     * Scan an archive
-    *
+    * @param file        The File to be scanned
     * @param gProvides   The global provides map
     * @param known       The set of known archives
     * @param blacklisted The set of black listed packages
     * @return The archive
     */
 
-   public Archive scan(InputStream is, String name, String canonicalPath, Map<String, SortedSet<String>> gProvides,
+   public Archive scan(File file, Map<String, SortedSet<String>> gProvides,
                               List<Archive> known, Set<String> blacklisted) throws IOException;
 
 }

@@ -578,10 +578,7 @@ public class Main
             for (File file : fileList)
             {
                ArchiveScanner scanner = analyzer.getScanner(file);
-               FileInputStream fis = new FileInputStream(file);
-               String name = file.getName();
-               String canonicalPath = file.getCanonicalPath();
-               Archive archive = scanner.scan(fis, name, canonicalPath, gProvides, known, blacklistedSet);
+               Archive archive = scanner.scan(file, gProvides, known, blacklistedSet);
                if (archive != null)
                {
                   SortedSet<Location> locations = locationsMap.get(archive.getName());

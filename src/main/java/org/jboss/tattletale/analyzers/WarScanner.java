@@ -60,9 +60,9 @@ public class WarScanner extends AbstractScanner
     *
     * @return The archive
     */
-   public Archive scan(InputStream inputStream, String name, String canonicalPath)
+   public Archive scan(File file)
    {
-      return scan(inputStream, name, canonicalPath, null, null, null);
+      return scan(file, null, null, null);
    }
 
    /**
@@ -73,7 +73,7 @@ public class WarScanner extends AbstractScanner
     * @param blacklisted The set of black listed packages
     * @return The archive
     */
-   public Archive scan(InputStream inputStream, String name, String canonicalPath, Map<String, SortedSet<String>> gProvides,
+   public Archive scan(File war, Map<String, SortedSet<String>> gProvides,
                        List<Archive> known,
                        Set<String> blacklisted)
    {
@@ -82,9 +82,11 @@ public class WarScanner extends AbstractScanner
       List<Archive> subArchiveList = new ArrayList<Archive>();
       ArchiveScanner jarScanner = new JarScanner();
       JarFile warFile = null;
+      String name = war.getName();
       try
       {
-         warFile = new JarFile(name);
+         String canonicalPath = war.getCanonicalPath();
+         warFile = new JarFile(war);
          Integer classVersion = null;
          SortedSet<String> requires = new TreeSet<String>();
          SortedMap<String, Long> provides = new TreeMap<String, Long>();
@@ -99,16 +101,24 @@ public class WarScanner extends AbstractScanner
          {
             JarEntry warEntry = warEntries.nextElement();
             String entryName = warEntry.getName();
+            InputStream entryStream = null;
             if (entryName.endsWith(".class"))
             {
                try
                {
-                  classVersion = ClassScanner.scan(inputStream, blacklisted, known, classVersion, provides, requires, profiles,
-                        classDependencies, packageDependencies, blacklistedDependencies);
+                  entryStream = warFile.getInputStream(warEntry);
+                  classVersion = scanClasses(entryStream, blacklisted, known, classVersion, provides, requires, profiles, classDependencies, packageDependencies, blacklistedDependencies);
                }
                catch (Exception openException)
                {
-                  // Ignore
+                  openException.printStackTrace();
+               }
+               finally
+               {
+                  if (entryStream != null)
+                  {
+                     entryStream.close();
+                  }
                }
             }
             else if (entryName.contains("META-INF") && entryName.endsWith(".SF"))
@@ -154,14 +164,12 @@ public class WarScanner extends AbstractScanner
             }
             else if (entryName.endsWith(".jar"))
             {
-               File jarFile = Extractor.extract(inputStream, warEntry);
-               FileInputStream jarStream = new FileInputStream(jarFile);
-               String jarPath = jarFile.getCanonicalPath();
-               Archive jarArchive = jarScanner.scan(jarStream, jarPath, jarPath, gProvides, known, blacklisted);
+               File jarFile = Extractor.extract(warFile);
+               Archive jarArchive = jarScanner.scan(jarFile, gProvides, known, blacklisted);
                subArchiveList.add(jarArchive);
             }
          }
-         if (provides.size() == 0)
+         if (provides.size() == 0 && subArchiveList.size() == 0)
          {
             return null;
          }
@@ -180,7 +188,6 @@ public class WarScanner extends AbstractScanner
 
          warArchive = new WarArchive(name, classVersion, lManifest, lSign, requires, provides,
                classDependencies, packageDependencies, blacklistedDependencies, location, subArchiveList);
-
          super.addProfilesToArchive(warArchive, profiles);
          Iterator<String> it = provides.keySet().iterator();
          while (it.hasNext())
@@ -202,7 +209,7 @@ public class WarScanner extends AbstractScanner
       }
       catch (IOException ioe)
       {
-         // Probably not a JAR archive
+        ioe.printStackTrace();
       }
       catch (Exception e)
       {
@@ -223,7 +230,6 @@ public class WarScanner extends AbstractScanner
             // Ignore
          }
       }
-
       return warArchive;
    }
 
