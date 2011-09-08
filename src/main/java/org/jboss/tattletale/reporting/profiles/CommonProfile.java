@@ -139,4 +139,12 @@ public abstract class CommonProfile extends NestableArchive
 
       return false;
    }
+
+   /**
+    * @return a Set containing the classes
+    */
+   public SortedSet<String> getClassSet()
+   {
+      return classSet;
+   }
 }
