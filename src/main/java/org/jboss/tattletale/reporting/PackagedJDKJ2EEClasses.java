@@ -22,12 +22,11 @@
 package org.jboss.tattletale.reporting;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.ArchiveTypes;
 import org.jboss.tattletale.core.Location;
@@ -211,72 +210,6 @@ public class PackagedJDKJ2EEClasses extends AbstractReport
                      break;
                   }
                }
-            }
-         }
-      }
-   }
-
-   /**
-    * This was the original method used to write the report, I've rewritten into analyze and writeSummary and writeDetailed which
-    *   can be printed to the report in any order
-    * @param bw
-    * @throws IOException
-    */
-   private void writeDetail(BufferedWriter bw) throws IOException
-   {
-      SortedSet<String> envProvidedClassSet = new TreeSet<String>();
-      envProvidedClassSet.addAll(new SunJava6().getClassSet());
-      envProvidedClassSet.addAll(new JavaEE5().getClassSet());
-
-      String[] profileProblemLevel = new String[]
-      {"PROBLEM", "PROBLEM"};
-      CommonProfile[] profiles = new CommonProfile[]
-      {new SunJava6(), new JavaEE5()};
-
-      boolean archiveNameWritten;
-      for (Archive archive : archives)
-      {
-         archiveNameWritten = false;
-
-         if (archive.getType() == ArchiveTypes.JAR)
-         {
-            Set<String> classes = archive.getProvides().keySet();
-            // loop through profiles, create a section for each profile
-            boolean profileNameWritten;
-            int i = -1;
-            for (CommonProfile profile : profiles)
-            {
-               i++;
-               profileNameWritten = false;
-               for (String clz : classes)
-               {
-                  if (profile.doesProvide(clz))
-                  {
-                     // track archives that contain classes they shouldn't in summary
-                     summarySet.add(archive);
-
-                     // log the archive name once
-                     if (!archiveNameWritten)
-                     {
-                        writeArchiveName(bw, archive);
-                        archiveNameWritten = true;
-                     }
-                     if (!profileNameWritten)
-                     {
-                        bw.write("<h2>" + profileProblemLevel[i] + " - '" + profile.getName()
-                              + "' already contains these classes:</h2>" + Dump.newLine());
-                        bw.write("<ul>" + Dump.newLine());
-                        profileNameWritten = true;
-                     }
-
-                     // log the class that is included by the jdk or
-                     // container
-                     bw.write("<li>" + clz + "</li>" + Dump.newLine());
-                  }
-               }
-               // close the profile block
-               if (profileNameWritten)
-                  bw.write("</ul>" + Dump.newLine());
             }
          }
       }

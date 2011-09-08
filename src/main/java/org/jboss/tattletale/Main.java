@@ -42,6 +42,7 @@ import org.jboss.tattletale.reporting.MultipleJarsReport;
 import org.jboss.tattletale.reporting.MultipleLocationsReport;
 import org.jboss.tattletale.reporting.NoVersionReport;
 import org.jboss.tattletale.reporting.OSGiReport;
+import org.jboss.tattletale.reporting.PackagedJDKJ2EEClasses;
 import org.jboss.tattletale.reporting.PackageDependantsReport;
 import org.jboss.tattletale.reporting.PackageDependsOnReport;
 import org.jboss.tattletale.reporting.PackageMultipleJarsReport;
@@ -183,6 +184,7 @@ public class Main
       addGeneralReport(InvalidVersionReport.class);
       addGeneralReport(BlackListedReport.class);
       addGeneralReport(UnusedJarReport.class);
+      addGeneralReport(PackagedJDKJ2EEClasses.class);
 
       this.customReports = new ArrayList<Class>();
    }
