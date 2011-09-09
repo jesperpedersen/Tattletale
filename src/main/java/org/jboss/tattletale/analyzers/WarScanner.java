@@ -22,7 +22,9 @@
 
 package org.jboss.tattletale.analyzers;
 
+import org.apache.tools.ant.taskdefs.Jar;
 import org.jboss.tattletale.core.Archive;
+import org.jboss.tattletale.core.ClassesArchive;
 import org.jboss.tattletale.core.Location;
 import org.jboss.tattletale.core.WarArchive;
 
@@ -85,8 +87,10 @@ public class WarScanner extends AbstractScanner
       String name = war.getName();
       try
       {
+
          String canonicalPath = war.getCanonicalPath();
          warFile = new JarFile(war);
+         File extractedDir = Extractor.extract(warFile);
          Integer classVersion = null;
          SortedSet<String> requires = new TreeSet<String>();
          SortedMap<String, Long> provides = new TreeMap<String, Long>();
@@ -95,6 +99,7 @@ public class WarScanner extends AbstractScanner
          SortedMap<String, SortedSet<String>> packageDependencies = new TreeMap<String, SortedSet<String>>();
          SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
          List<String> lSign = null;
+
          Enumeration<JarEntry> warEntries = warFile.entries();
 
          while (warEntries.hasMoreElements())
@@ -107,7 +112,9 @@ public class WarScanner extends AbstractScanner
                try
                {
                   entryStream = warFile.getInputStream(warEntry);
-                  classVersion = scanClasses(entryStream, blacklisted, known, classVersion, provides, requires, profiles, classDependencies, packageDependencies, blacklistedDependencies);
+                  classVersion = scanClasses(entryStream, blacklisted, known, classVersion, provides,
+                        requires, profiles, classDependencies, packageDependencies, blacklistedDependencies);
+
                }
                catch (Exception openException)
                {
@@ -164,7 +171,7 @@ public class WarScanner extends AbstractScanner
             }
             else if (entryName.endsWith(".jar"))
             {
-               File jarFile = Extractor.extract(warFile);
+               File jarFile = new File(extractedDir.getCanonicalPath(), entryName);
                Archive jarArchive = jarScanner.scan(jarFile, gProvides, known, blacklisted);
                subArchiveList.add(jarArchive);
             }
@@ -173,6 +180,7 @@ public class WarScanner extends AbstractScanner
          {
             return null;
          }
+
 
          String version = null;
          List<String> lManifest = null;
@@ -185,6 +193,11 @@ public class WarScanner extends AbstractScanner
          }
 
          Location location = new Location(canonicalPath, version);
+
+         String classesName = name + "/WEB-INF/classes";
+         ClassesArchive classesArchive = new ClassesArchive(classesName, classVersion, lManifest, lSign, requires,
+               provides, classDependencies, packageDependencies, blacklistedDependencies, location);
+         subArchiveList.add(classesArchive);
 
          warArchive = new WarArchive(name, classVersion, lManifest, lSign, requires, provides,
                classDependencies, packageDependencies, blacklistedDependencies, location, subArchiveList);

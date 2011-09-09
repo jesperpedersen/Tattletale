@@ -59,6 +59,7 @@ public class Extractor
       {
          throw new IOException("Could not create " + target);
       }
+
       Enumeration<JarEntry> entries = war.entries();
       while (entries.hasMoreElements())
       {
@@ -130,7 +131,6 @@ public class Extractor
             }
          }
       }
-      war.close();
       return target;
    }
    private static void recursiveDelete(File file) throws IOException

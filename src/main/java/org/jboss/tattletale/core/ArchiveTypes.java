@@ -28,11 +28,14 @@ package org.jboss.tattletale.core;
  */
 public class ArchiveTypes
 {
+   /** CLASS */
+   public static final int CLASS = 0;
+
    /** JAR */
-   public static final int JAR = 0;
+   public static final int JAR = 1;
 
    /** WAR */
-   public static final int WAR = 1;
+   public static final int WAR = 2;
 
    /** Constructor */
    private ArchiveTypes()

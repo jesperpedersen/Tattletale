@@ -75,7 +75,6 @@ public class JarScanner extends AbstractScanner
    public Archive scan(File file, Map<String, SortedSet<String>> gProvides, List<Archive> known,
                        Set<String> blacklisted)
    {
-      System.out.println("Jar Scanner called");
       Archive archive = null;
       JarFile jarFile = null;
       String name = file.getName();
@@ -108,7 +107,6 @@ public class JarScanner extends AbstractScanner
                }
                catch (Exception ie)
                {
-                  System.out.println("Exception of type: " + ie.getClass().toString());
                   ie.printStackTrace();
                }
                finally

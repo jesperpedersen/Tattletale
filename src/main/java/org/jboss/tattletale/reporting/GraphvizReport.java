@@ -23,6 +23,7 @@ package org.jboss.tattletale.reporting;
 
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.ArchiveTypes;
+import org.jboss.tattletale.core.ClassesArchive;
 import org.jboss.tattletale.core.NestableArchive;
 
 import java.io.BufferedReader;
@@ -126,6 +127,10 @@ public class GraphvizReport extends CLSReport
          {
             NestableArchive nestableArchive = (NestableArchive) archive;
             recusivelyWriteContent(bw, alldotw, nestableArchive.getSubArchives());
+         }
+         else if (archive instanceof ClassesArchive)
+         {
+            // No op.
          }
          else
          {
