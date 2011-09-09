@@ -43,8 +43,10 @@ public class Extractor
 {
 
    /** Extract a JAR type file
-    * @return The root of the extracted JAR file
-    * @exception IOException Thrown if an error occurs
+    *
+    * @param war  The war file
+    * @return     The root of the extracted JAR file
+    * @exception  IOException Thrown if an error occurs
     */
    public static File extract(JarFile war) throws IOException
    {

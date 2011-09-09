@@ -22,10 +22,6 @@
 
 package org.jboss.tattletale.analyzers;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtField;
-import javassist.NotFoundException;
 import org.jboss.tattletale.core.Archive;
 
 import java.io.ByteArrayInputStream;
@@ -44,6 +40,14 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.NotFoundException;
+
+
+
 
 /**
  * Abstract class that contains utility methods that other scanner extensions can use.

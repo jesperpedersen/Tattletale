@@ -27,7 +27,6 @@ import org.jboss.tattletale.analyzers.DirectoryScanner;
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.ArchiveTypes;
 import org.jboss.tattletale.core.Location;
-import org.jboss.tattletale.core.NestableArchive;
 import org.jboss.tattletale.reporting.BlackListedReport;
 import org.jboss.tattletale.reporting.CircularDependencyReport;
 import org.jboss.tattletale.reporting.ClassDependantsReport;
@@ -55,6 +54,7 @@ import org.jboss.tattletale.reporting.SignReport;
 import org.jboss.tattletale.reporting.TransitiveDependantsReport;
 import org.jboss.tattletale.reporting.TransitiveDependsOnReport;
 import org.jboss.tattletale.reporting.UnusedJarReport;
+import org.jboss.tattletale.reporting.WarReport;
 import org.jboss.tattletale.reporting.profiles.CDI10;
 import org.jboss.tattletale.reporting.profiles.CommonProfile;
 import org.jboss.tattletale.reporting.profiles.JavaEE5;
@@ -1015,9 +1015,7 @@ public class Main
    }
 
    /**
-    * Add the JAR reports based on the archive that we have. Essentially a recursive method in order to check for
-    * calls that could be made on a {@link NestableArchive}
-    *
+    * Add the reports based on the archive that we have.
     * @param archives - the collection of Archives.
     * @param reportSetBuilder - the Report Set Builder required to add a new JarReport if there is a JarArchive found.
     */
@@ -1026,11 +1024,10 @@ public class Main
    {
       for (Archive a : archives)
       {
-
-         if (a instanceof NestableArchive)
+         if (a.getType() == ArchiveTypes.WAR)
          {
-            NestableArchive nestableArchive = (NestableArchive) a;
-            addJarReports(nestableArchive.getSubArchives(), reportSetBuilder);
+            System.out.println("Building a WarReport");
+            reportSetBuilder.addReport(new WarReport(a));
          }
          else if (a.getType() == ArchiveTypes.JAR)
          {

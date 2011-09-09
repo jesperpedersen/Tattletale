@@ -23,7 +23,6 @@
 package org.jboss.tattletale.reporting;
 
 import org.jboss.tattletale.core.Archive;
-import org.jboss.tattletale.core.ArchiveTypes;
 import org.jboss.tattletale.core.NestableArchive;
 
 import java.io.BufferedWriter;

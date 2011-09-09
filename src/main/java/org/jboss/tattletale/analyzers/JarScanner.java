@@ -42,7 +42,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 /**
@@ -56,7 +55,7 @@ public class JarScanner extends AbstractScanner
 
    /**
     * Scan an archive
-    *
+    * @param file        The file
     * @return The archive
     */
    public Archive scan(File file)
@@ -67,6 +66,7 @@ public class JarScanner extends AbstractScanner
    /**
     * Scan an archive
     *
+    * @param file        The file
     * @param gProvides   The global provides map
     * @param known       The set of known archives
     * @param blacklisted The set of black listed packages
@@ -92,7 +92,7 @@ public class JarScanner extends AbstractScanner
          List<String> lSign = null;
          Enumeration<JarEntry> jarEntries = jarFile.entries();
 
-         while(jarEntries.hasMoreElements())
+         while (jarEntries.hasMoreElements())
          {
             JarEntry jarEntry = jarEntries.nextElement();
             String entryName = jarEntry.getName();
@@ -102,8 +102,8 @@ public class JarScanner extends AbstractScanner
                try
                {
                   entryStream = jarFile.getInputStream(jarEntry);
-                  classVersion = scanClasses(entryStream, blacklisted, known, classVersion, provides, requires, profiles,
-                        classDependencies, packageDependencies, blacklistedDependencies);
+                  classVersion = scanClasses(entryStream, blacklisted, known, classVersion, provides, requires,
+                        profiles, classDependencies, packageDependencies, blacklistedDependencies);
                }
                catch (Exception ie)
                {

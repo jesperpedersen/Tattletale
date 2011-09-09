@@ -22,14 +22,12 @@
 
 package org.jboss.tattletale.analyzers;
 
-import org.apache.tools.ant.taskdefs.Jar;
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.ClassesArchive;
 import org.jboss.tattletale.core.Location;
 import org.jboss.tattletale.core.WarArchive;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,7 +44,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 /**
@@ -59,17 +56,18 @@ public class WarScanner extends AbstractScanner
 {
    /**
     * Scan a .war archive
-    *
+    * @param war        The file
     * @return The archive
     */
-   public Archive scan(File file)
+   public Archive scan(File war)
    {
-      return scan(file, null, null, null);
+      return scan(war, null, null, null);
    }
 
    /**
     * Scan a .war archive
     *
+    * @param war        The file
     * @param gProvides   The global provides map
     * @param known       The set of known archives
     * @param blacklisted The set of black listed packages
@@ -222,7 +220,7 @@ public class WarScanner extends AbstractScanner
       }
       catch (IOException ioe)
       {
-        ioe.printStackTrace();
+         ioe.printStackTrace();
       }
       catch (Exception e)
       {
