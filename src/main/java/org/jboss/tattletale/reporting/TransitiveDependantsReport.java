@@ -166,6 +166,7 @@ public class TransitiveDependantsReport extends CLSReport
                   .getSubArchives());
             dependantsMap.putAll(subDependants);
          }
+         else
          {
             SortedSet<String> result = new TreeSet<String>();
 
