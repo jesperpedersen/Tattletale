@@ -77,6 +77,9 @@ public abstract class Archive implements Serializable, Comparable
    /** OSGi archive */
    private transient Boolean osgi;
 
+   /** Module identifier */
+   private String moduleIdentifier;
+
    /**
     * Constructor
     *
@@ -348,6 +351,34 @@ public abstract class Archive implements Serializable, Comparable
       return osgi.booleanValue();
    }
 
+   /**
+    * Simple getter that will return the name of the archive if the custom setter has not been previously used.
+    *
+    * @return - the module identifier if the custom setter has not been used otherwise the name of the archive.
+    */
+   public String getModuleIdentifier()
+   {
+      if (this.moduleIdentifier != null)
+      {
+         return moduleIdentifier;
+      }
+      else
+      {
+         return name;
+      }
+
+   }
+
+   /**
+    * Custom setter method.
+    * @param moduleIdentifier - the identifier that a user wishes to apply.
+    */
+   public void setModuleIdentifier(String moduleIdentifier)
+   {
+      this.moduleIdentifier = moduleIdentifier;
+   }
+
+
    /** Init OSGi */
    private void initOSGi()
    {
@@ -459,4 +490,5 @@ public abstract class Archive implements Serializable, Comparable
 
       return sb.toString();
    }
+
 }
