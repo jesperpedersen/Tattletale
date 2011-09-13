@@ -39,13 +39,18 @@ public class Analyzer
     */
    public ArchiveScanner getScanner(File file)
    {
-      if (file.getName().contains(".jar"))
+      String fileName = file.getName();
+      if (fileName.contains(".jar"))
       {
          return new JarScanner();
       }
-      else if (file.getName().contains(".war"))
+      else if (fileName.contains(".war"))
       {
          return new WarScanner();
+      }
+      else if (fileName.contains(".ear"))
+      {
+         return new EarScanner();
       }
       else
       {

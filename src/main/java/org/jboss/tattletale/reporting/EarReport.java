@@ -34,33 +34,27 @@ import javassist.bytecode.ClassFile;
 
 
 /**
- * This type of report is to .war files as to {@link JarReport} is to .jar files.
- *
+ * This type of report is to .ear files as to {@link JarReport} is to .jar files.
  * @author Navin Surtani
  */
-public class WarReport extends ArchiveReport
+public class EarReport extends ArchiveReport
 {
    /** DIRECTORY */
-   private static final String DIRECTORY = "war";
+   private static final String DIRECTORY = "ear";
    private String fileName;
-
 
    /**
     * Constructor
-    *
-    * @param archive - the war archive.
+    * @param archive  The archive
     */
-   public WarReport(Archive archive)
+   public EarReport(Archive archive)
    {
-      super (DIRECTORY, ReportSeverity.INFO, archive);
-      StringBuffer sb = new StringBuffer(archive.getName());
-      setFilename(sb.append(".html").toString());
+      super(DIRECTORY, ReportSeverity.INFO, archive);
    }
 
    /**
     * Get the name of the directory
-    *
-    * @return The directory
+    * @return - the directory
     */
    @Override
    public String getDirectory()
@@ -68,17 +62,15 @@ public class WarReport extends ArchiveReport
       return DIRECTORY;
    }
 
-   /**
-    * returns a war report specific writer.
-    * war reports don't use a index.html but a html per archive.
-    *
-    * @return the BufferedWriter
-    * @throws IOException if an error occurs
-    */
    @Override
    BufferedWriter getBufferedWriter() throws IOException
    {
       return getBufferedWriter(getFilename());
+   }
+
+   private String getFilename()
+   {
+      return fileName;
    }
 
    @Override
@@ -288,14 +280,5 @@ public class WarReport extends ArchiveReport
 
       bw.write("<a href=\"../index.html\">Main</a>" + Dump.newLine());
       bw.write("<p>" + Dump.newLine());
-   }
-   private String getFilename()
-   {
-      return fileName;
-   }
-
-   private void setFilename(String fileName)
-   {
-      this.fileName = fileName;
    }
 }

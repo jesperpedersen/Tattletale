@@ -37,6 +37,9 @@ public class ArchiveTypes
    /** WAR */
    public static final int WAR = 2;
 
+   /** EAR */
+   public static final int EAR = 3;
+
    /** Constructor */
    private ArchiveTypes()
    {

@@ -44,14 +44,25 @@ public class Extractor
 
    /** Extract a JAR type file
     *
-    * @param war  The war file
+    * @param war  The war/ear file
     * @return     The root of the extracted JAR file
     * @exception  IOException Thrown if an error occurs
     */
    public static File extract(JarFile war) throws IOException
    {
       String basedir = System.getProperty("java.io.tmpdir");
-      File target = new File(basedir, "tt_tmp");
+      String warName = war.getName();
+      File target;
+
+      if (warName.startsWith(basedir))
+      {
+         target = new File(warName);
+      }
+      else
+      {
+         target = new File(basedir, warName);
+      }
+      System.out.println("Target destination is: " + target.getCanonicalPath());
 
       if (target.exists())
       {

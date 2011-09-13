@@ -35,6 +35,7 @@ import org.jboss.tattletale.reporting.ClassLocationReport;
 import org.jboss.tattletale.reporting.DependantsReport;
 import org.jboss.tattletale.reporting.DependsOnReport;
 import org.jboss.tattletale.reporting.Dump;
+import org.jboss.tattletale.reporting.EarReport;
 import org.jboss.tattletale.reporting.EliminateJarsReport;
 import org.jboss.tattletale.reporting.GraphvizReport;
 import org.jboss.tattletale.reporting.InvalidVersionReport;
@@ -159,7 +160,7 @@ public class Main
       this.failOnWarn = false;
       this.failOnError = false;
       this.reports = null;
-      this.scan = ".jar,.war";
+      this.scan = ".jar,.war,.ear";
 
       this.dependencyReports = new ArrayList<Class>();
       addDependencyReport(ClassDependsOnReport.class);
@@ -543,7 +544,7 @@ public class Main
       }
       else
       {
-         DirectoryScanner.setArchives(".jar, .war");
+         DirectoryScanner.setArchives(".jar, .war, .ear");
       }
 
       Map<String, SortedSet<Location>> locationsMap = new HashMap<String, SortedSet<Location>>();
@@ -1026,12 +1027,15 @@ public class Main
       {
          if (a.getType() == ArchiveTypes.WAR)
          {
-            System.out.println("Building a WarReport");
             reportSetBuilder.addReport(new WarReport(a));
          }
          else if (a.getType() == ArchiveTypes.JAR)
          {
             reportSetBuilder.addReport(new JarReport(a));
+         }
+         else if (a.getType() == ArchiveTypes.EAR)
+         {
+            reportSetBuilder.addReport(new EarReport(a));
          }
       }
    }
