@@ -50,13 +50,13 @@ public class Extractor
     */
    public static File extract(JarFile war) throws IOException
    {
-      String basedir = System.getProperty("java.io.tmpdir");
+      String basedir = new File(System.getProperty("java.io.tmpdir")).getCanonicalPath();
       String warName = war.getName();
       File target;
 
       if (warName.startsWith(basedir))
       {
-         target = new File(warName);
+         target = new File(warName+".extracted.war");
       }
       else
       {
