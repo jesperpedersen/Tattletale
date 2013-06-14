@@ -56,7 +56,7 @@ public class Extractor
 
       if (fileName.startsWith(basedir))
       {
-         target = new File(fileName);
+         target = new File(fileName + ".extracted");
       }
       else
       {
