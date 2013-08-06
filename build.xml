@@ -456,7 +456,7 @@
     <attribute name="extension"/>
     <sequential>
       <concat destfile="${dist.dir}/@{file}" append="true" force="true" eol="unix">
-mvn -s ${mavensettings} org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file -Dfile=$PWD/@{artifact}.@{extension} -DpomFile=@{artifact}.xml -Dsources=$PWD/@{artifact}-sources.jar -Djavadoc=$PWD/@{artifact}-javadoc.jar $REPOSITORY
+mvn -s ${mavensettings} org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file -Dfile=$PWD/@{artifact}.@{extension} -DpomFile=$PWD/@{artifact}.xml -Dsources=$PWD/@{artifact}-sources.jar -Djavadoc=$PWD/@{artifact}-javadoc.jar $REPOSITORY
 </concat>
     </sequential>
   </macrodef>
@@ -467,7 +467,7 @@ mvn -s ${mavensettings} org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-
     <attribute name="extension"/>
     <sequential>
       <concat destfile="${dist.dir}/@{file}" append="true" force="true" eol="unix">
-mvn install:install-file -Dfile=$PWD/@{artifact}.@{extension} -DpomFile=@{artifact}.xml -Dsources=$PWD/@{artifact}-sources.jar -Djavadoc=$PWD/@{artifact}-javadoc.jar
+mvn install:install-file -Dfile=$PWD/@{artifact}.@{extension} -DpomFile=$PWD/@{artifact}.xml -Dsources=$PWD/@{artifact}-sources.jar -Djavadoc=$PWD/@{artifact}-javadoc.jar
 </concat>
     </sequential>
   </macrodef>
@@ -481,13 +481,13 @@ mvn install:install-file -Dfile=$PWD/@{artifact}.@{extension} -DpomFile=@{artifa
     <delete file="${dist.dir}/install.sh"/>
 
     <concat destfile="${dist.dir}/deploy.sh" append="true" force="true" eol="unix">#!/bin/sh
-PWD=`pwd`
+PWD=`dirname "$0"`
 VERSION=${version}
 REPOSITORY='-Durl=${repositoryurl} -DrepositoryId=${repositoryid}'
 </concat>
 
     <concat destfile="${dist.dir}/install.sh" append="true" force="true" eol="unix">#!/bin/sh
-PWD=`pwd`
+PWD=`dirname "$0"`
 VERSION=${version}
 </concat>
 
