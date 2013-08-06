@@ -107,6 +107,10 @@
           <description>Should a failed ERROR report throw error.</description>
         </parameter>
       </parameters>
+      <configuration>
+        <source implementation="java.lang.String" default-value="target">${tattletale.source}</source>
+        <destination implementation="java.lang.String" default-value="target/tattletale">${tattletale.destination}</destination>
+      </configuration>
     </mojo>
   </mojos>
   <dependencies>
