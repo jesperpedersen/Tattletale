@@ -1094,7 +1094,7 @@ public class Main
             main.setFailOnInfo(false);
             main.setFailOnWarn(false);
             main.setFailOnError(false);
-            main.setDeleteOutputDirectory(true);
+            main.setDeleteOutputDirectory(false);
 
             main.execute();
          }
@@ -1323,10 +1323,14 @@ public class Main
          outputDir = !outputDir.substring(outputDir.length() - 1).equals(File.separator)
                      ? outputDir + File.separator : outputDir;
          // Verify output directory exists & create if it does not
-         File outputDirFile = new File(outputDir);
+         final File outputDirFile = new File(outputDir);
 
          if (outputDirFile.exists())
          {
+            if (!outputDirFile.isDirectory())
+            {
+               throw new IOException(outputDir + " is not a directory");
+            }
             if (deleteOutputDirectory)
             {
                if (!outputDirFile.equals(new File(".")))
