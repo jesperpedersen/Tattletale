@@ -73,7 +73,7 @@ public class ReportTask extends AbstractReportTask
       this.failOnInfo = false;
       this.failOnWarn = false;
       this.failOnError = false;
-      this.deleteOutputDirectory = true;
+      this.deleteOutputDirectory = false;
       this.reports = null;
       this.scan = null;
    }
