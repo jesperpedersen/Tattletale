@@ -105,7 +105,7 @@ public class Main
 
    /** Destination */
    private String destination;
-
+      
    /** Configuration */
    private String configuration;
 
@@ -167,7 +167,7 @@ public class Main
       this.failOnInfo = false;
       this.failOnWarn = false;
       this.failOnError = false;
-      this.deleteOutputDirectory = true;
+      this.deleteOutputDirectory = false;
       this.reports = null;
       this.scan = ".jar,.war,.ear";
 
@@ -361,7 +361,7 @@ public class Main
    {
       this.reports = reports;
    }
-
+   
    /**
     * Set the scan
     *
@@ -1089,12 +1089,19 @@ public class Main
                main.setExcludes(args[arg].substring(args[arg].indexOf("=") + 1));
                arg++;
             }
+            
+            else if (args[arg].startsWith("-DOD="))
+            {
+            	main.setDeleteOutputDirectory(true);
+                arg++;
+            }
+            
             main.setSource(args[arg]);
             main.setDestination(args.length > arg + 1 ? args[arg + 1] : ".");
             main.setFailOnInfo(false);
             main.setFailOnWarn(false);
             main.setFailOnError(false);
-            main.setDeleteOutputDirectory(true);
+            
 
             main.execute();
          }
@@ -1212,6 +1219,7 @@ public class Main
       private Set<String> reportSet;
       private SortedSet<Report> returnReportSet = new TreeSet<Report>();
       private final Map<String, Object> reportParameters = new HashMap<String, Object>();
+	private boolean delDirFile;
 
       /**
        * @param destination Where the reports go
@@ -1324,26 +1332,34 @@ public class Main
                      ? outputDir + File.separator : outputDir;
          // Verify output directory exists & create if it does not
          File outputDirFile = new File(outputDir);
-
+         
+         
          if (outputDirFile.exists())
          {
-            if (deleteOutputDirectory)
-            {
-               if (!outputDirFile.equals(new File(".")))
-               {
-                  recursiveDelete(outputDirFile);
-               }
-            }
-            else
-            {
-               throw new IOException("Directory: " + outputDir + " exists");
-            }
+        	 if (outputDirFile.list().length != 0) 
+         	 {
+        		 if (deleteOutputDirectory)
+        		 {
+        			 if (!outputDirFile.equals(new File(".")))
+   	        	     {
+   	        		  	recursiveDelete(outputDirFile);
+   	        	     }
+        		 }
+        		 else
+        		 {
+        			 throw new IOException("Directory is not empty. You must accept deleting files in directory.");
+        		 }
+         	 } 
          }
-
-         if (!outputDirFile.equals(new File(".")) && !outputDirFile.mkdirs())
+         
+         else
          {
-            throw new IOException("Cannot create directory: " + outputDir);
+        	 if (!outputDirFile.equals(new File(".")) && !outputDirFile.mkdirs())
+             {
+                throw new IOException("Cannot create directory: " + outputDir);
+             }
          }
+        
 
          return outputDir;
       }
