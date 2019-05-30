@@ -53,25 +53,17 @@ public class ModuleXml
 
          while (xmlStreamReader.hasNext())
          {
-            int eventCode = xmlStreamReader.next();
-
-            switch (eventCode)
+            if (xmlStreamReader.next() == XMLStreamReader.START_ELEMENT
+                    && "module".equals(xmlStreamReader.getLocalName()))
             {
-               case XMLStreamReader.START_ELEMENT :
-                  if ("module".equals(xmlStreamReader.getLocalName()))
+               for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++)
+               {
+                  String name = xmlStreamReader.getAttributeLocalName(i);
+                  if ("name".equals(name))
                   {
-                     for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++)
-                     {
-                        String name = xmlStreamReader.getAttributeLocalName(i);
-                        if ("name".equals(name))
-                        {
-                           return xmlStreamReader.getAttributeValue(i);
-                        }
-                     }
+                     return xmlStreamReader.getAttributeValue(i);
                   }
-                  break;
-
-               default :
+               }
             }
          }
       }
@@ -112,16 +104,9 @@ public class ModuleXml
 
       while (eventCode != XMLStreamReader.END_ELEMENT)
       {
-         switch (eventCode)
+         if (eventCode == XMLStreamReader.CHARACTERS && !xmlStreamReader.getText().trim().isEmpty())
          {
-            case XMLStreamReader.CHARACTERS :
-               if (!xmlStreamReader.getText().trim().equals(""))
-               {
-                  result = xmlStreamReader.getText().trim();
-               }
-               break;
-
-            default :
+            result = xmlStreamReader.getText().trim();
          }
 
          eventCode = xmlStreamReader.next();

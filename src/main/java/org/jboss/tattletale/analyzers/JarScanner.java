@@ -27,7 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,11 +90,9 @@ public class JarScanner extends AbstractScanner
          final SortedMap<String, SortedSet<String>> packageDependencies = new TreeMap<String, SortedSet<String>>();
          final SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
          List<String> lSign = null;
-         final Enumeration<JarEntry> jarEntries = jarFile.entries();
 
-         while (jarEntries.hasMoreElements())
+         for (JarEntry jarEntry  : Collections.list(jarFile.entries()))
          {
-            JarEntry jarEntry = jarEntries.nextElement();
             String entryName = jarEntry.getName();
             InputStream entryStream = null;
             if (entryName.endsWith(".class"))

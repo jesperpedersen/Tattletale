@@ -129,9 +129,8 @@ public class DependantsReport extends CLSReport
       if (archive instanceof NestableArchive)
       {
          final NestableArchive nestableArchive = (NestableArchive) archive;
-         final List<Archive> subArchives = nestableArchive.getSubArchives();
          requires.addAll(nestableArchive.getRequires());
-         for (Archive sa : subArchives)
+         for (Archive sa : nestableArchive.getSubArchives())
          {
             requires.addAll(getRequires(sa));
          }

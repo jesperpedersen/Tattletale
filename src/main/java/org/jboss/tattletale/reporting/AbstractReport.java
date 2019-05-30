@@ -485,7 +485,7 @@ public abstract class AbstractReport implements Report
       String extension = archive.getType().toString();
       for (Archive parent; (parent = archive.getParentArchive()) != null; archive = parent)
       {
-         extension = parent.getType().toString() + "/" + extension;
+         extension = String.format("%s/%s", parent.getType().toString(), extension);
       }
       reportPaths.put(archiveName, extension);
    }

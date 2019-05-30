@@ -22,7 +22,6 @@
 package org.jboss.tattletale.reporting.classloader;
 
 import java.io.File;
-import java.util.SortedSet;
 
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.Location;
@@ -48,10 +47,7 @@ public class JBossAS5ClassLoaderStructure extends JBossASClassLoaderStructure
     */
    public boolean isVisible(Archive from, Archive to)
    {
-      final SortedSet<Location> fromLocations = from.getLocations();
-      final SortedSet<Location> toLocations = to.getLocations();
-
-      for (Location fromLocation : fromLocations)
+      for (Location fromLocation : from.getLocations())
       {
          String fromPath = fromLocation.getFilename();
 
@@ -61,7 +57,7 @@ public class JBossAS5ClassLoaderStructure extends JBossASClassLoaderStructure
 
          if (!fp.startsWith("docs"))
          {
-            for (Location toLocation : toLocations)
+            for (Location toLocation : to.getLocations())
             {
                String toPath = toLocation.getFilename();
 

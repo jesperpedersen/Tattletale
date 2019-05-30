@@ -29,7 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.jar.JarEntry;
@@ -156,10 +156,8 @@ public class Extractor
          throw new IOException("Could not create " + target);
       }
 
-      final Enumeration<JarEntry> entries = jf.entries();
-      while (entries.hasMoreElements())
+      for (JarEntry je : Collections.list(jf.entries()))
       {
-         JarEntry je = entries.nextElement();
          Matcher matcher = extractPattern.matcher(je.getName());
          if (!je.isDirectory() && !matcher.matches())
          {

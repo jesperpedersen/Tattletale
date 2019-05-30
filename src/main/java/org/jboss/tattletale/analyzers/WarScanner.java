@@ -28,7 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,11 +155,8 @@ public class WarScanner extends AbstractScanner
          List<String> lSign = null;
          final Map<String, ClassScanner> classBundles = new HashMap<String, ClassScanner>();
 
-         final Enumeration<JarEntry> warEntries = warFile.entries();
-
-         while (warEntries.hasMoreElements())
+         for (JarEntry warEntry : Collections.list(warFile.entries()))
          {
-            JarEntry warEntry = warEntries.nextElement();
             String entryName = warEntry.getName();
             InputStream entryStream = null;
             if (entryName.endsWith(".class"))

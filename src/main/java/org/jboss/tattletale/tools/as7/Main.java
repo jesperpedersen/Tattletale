@@ -26,7 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -61,9 +60,7 @@ public class Main
 
             fw = new FileWriter(outputFile);
 
-            final List<File> jars = getFileListing(root);
-
-            for (File f : jars)
+            for (File f : getFileListing(root))
             {
                String moduleId = "";
                String archiveName = f.getName();
@@ -76,11 +73,8 @@ public class Main
 
                JarFile jf = new JarFile(f);
 
-               Enumeration<JarEntry> e = jf.entries();
-               while (e.hasMoreElements())
+               for (JarEntry je : Collections.list(jf.entries()))
                {
-                  JarEntry je = e.nextElement();
-
                   if (je.getName().endsWith(".class"))
                   {
                      String className = je.getName().replace('/', '.');
@@ -158,7 +152,7 @@ public class Main
                extension = file.getName().substring(file.getName().lastIndexOf('.'));
             }
 
-            if (null != extension && ".jar".equals(extension))
+            if (".jar".equals(extension))
             {
                result.add(file);
             }

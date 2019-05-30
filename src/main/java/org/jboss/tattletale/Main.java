@@ -679,11 +679,7 @@ public class Main
                   }
                   locations.addAll(a.getLocations());
                   locationsMap.put(a.getName(), locations);
-
-                  if (!archives.contains(a))
-                  {
-                     archives.add(a);
-                  }
+                  archives.add(a);
                }
             }
          }

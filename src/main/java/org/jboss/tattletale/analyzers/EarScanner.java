@@ -28,7 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,11 +163,8 @@ public class EarScanner extends AbstractScanner
          List<String> lSign = null;
          final Map<String, ClassScanner> classBundles = new HashMap<String, ClassScanner>();
 
-         final Enumeration<JarEntry> earEntries = earFile.entries();
-
-         while (earEntries.hasMoreElements())
+         for (JarEntry earEntry : Collections.list(earFile.entries()))
          {
-            JarEntry earEntry = earEntries.nextElement();
             String entryName = earEntry.getName();
             InputStream entryStream = null;
 
