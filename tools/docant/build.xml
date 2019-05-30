@@ -34,9 +34,9 @@
   <!-- ================================= 
        Properties              
        ================================= -->
-  <property name="docant.dir" value="${basedir}" />
-  <property name="docant.lib.dir" value="${docant.dir}/lib" />
-  <property name="docant.target.dir" value="${docant.dir}/target" />
+  <property name="docant.dir" value="${basedir}"/>
+  <property name="docant.lib.dir" value="${docant.dir}/lib"/>
+  <property name="docant.target.dir" value="${docant.dir}/target"/>
 
   <path id="lib.path.id">
     <fileset dir="${docant.lib.dir}">
@@ -67,7 +67,7 @@
        ================================= -->
   <target name="init">
     <fail message="The performance test suite requires JDK5+" unless="HAVE_JDK_1.5"/>
-    <mkdir dir="${docant.target.dir}" />
+    <mkdir dir="${docant.target.dir}"/>
   </target>
   
   <!-- ================================= 
