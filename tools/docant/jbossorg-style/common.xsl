@@ -29,7 +29,7 @@
     <!-- copied largely from the work done by Mark Newton for the Seam documentation -->
 
     <xsl:param name="use.simplified.author.group" select="1"/>
-<!--
+    <!--
     <xsl:param name="callout.graphics.path">
         <xsl:if test="$img.src.path != ''">
             <xsl:value-of select="$img.src.path"/>
@@ -43,6 +43,5 @@
         </xsl:if>
         <xsl:text>images/community/docbook/</xsl:text>
     </xsl:param>
--->
+    -->
 </xsl:stylesheet>
-
