@@ -1,347 +1,346 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="ant">
-   <title>Apache Ant</title>
+  <title>Apache Ant</title>
 
-   <para>JBoss Tattletale integrates with Apache Ant such that you can
-   generate the reports directly from your build environment.</para>
+  <para>JBoss Tattletale integrates with Apache Ant such that you can
+  generate the reports directly from your build environment.</para>
 
-   <para>First, you need to add tattletale.jar, tattletale-ant.jar and
-   javassist.jar to the Apache Ant classpath.</para>
+  <para>First, you need to add tattletale.jar, tattletale-ant.jar and
+  javassist.jar to the Apache Ant classpath.</para>
 
-   <para>Second, you need to add the following to your project
-   definition tag:</para>
+  <para>Second, you need to add the following to your project
+  definition tag:</para>
 
-   <programlisting>
+  <programlisting>
 xmlns:tattletale="antlib:org.jboss.tattletale.ant"
-   </programlisting>
+  </programlisting>
 
-   <para>That is it.</para>
+  <para>That is it.</para>
 
-   <para>Alternative, you can do a <code>taskdef</code> for each task</para>
+  <para>Alternative, you can do a <code>taskdef</code> for each task</para>
 
-   <programlisting>
+  <programlisting>
 &lt;taskdef name="report"
          classname="org.jboss.tattletale.ant.ReportTask"
          classpathref="tattletale.lib.path.id"/&gt;
-   </programlisting>
+  </programlisting>
 
-   <para>See the Apache Ant documentation for additional instructions on installation.</para>
+  <para>See the Apache Ant documentation for additional instructions on installation.</para>
 
-   <section id="ant_report">
-     <title>report</title>
-     <para>Usage:</para>
-     <programlisting>
+  <section id="ant_report">
+    <title>report</title>
+    <para>Usage:</para>
+    <programlisting>
 &lt;tattletale:report source="${src.dir]" destination="${dest.dir}"/&gt;
-     </programlisting>
+    </programlisting>
 
-     <table frame="all">
-       <title>Apache Ant: report</title>
-       <tgroup cols="2" align="left" colsep="1" rowsep="1">
-         <colspec colname="c1"/>
-         <colspec colname="c2" colwidth="5*"/>
-         <thead>
-           <row>
-             <entry align="left">Key</entry>
-             <entry align="left">Value</entry>
-           </row>
-         </thead>
-         <tbody>
-           <row>
-             <entry><code>source</code></entry>
-             <entry>
-               The directory that contains the Java archives. Multiple directories can be
-               scanned by separating each with the <code>File.pathSeparator</code> character - f.ex.
-               <code>dir1:dir2</code> on U*X.
-               <para>Default: Current directory</para>
+    <table frame="all">
+      <title>Apache Ant: report</title>
+      <tgroup cols="2" align="left" colsep="1" rowsep="1">
+        <colspec colname="c1"/>
+        <colspec colname="c2" colwidth="5*"/>
+        <thead>
+          <row>
+            <entry align="left">Key</entry>
+            <entry align="left">Value</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry><code>source</code></entry>
+            <entry>
+              The directory that contains the Java archives. Multiple directories can be
+              scanned by separating each with the <code>File.pathSeparator</code> character - f.ex.
+              <code>dir1:dir2</code> on U*X.
+              <para>Default: Current directory</para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>destination</code></entry>
+            <entry>
+              The directory where the reports should be generated
+              <para>Default: Current directory</para>
              </entry>
-           </row>
-           <row>
-             <entry><code>destination</code></entry>
-             <entry>
-               The directory where the reports should be generated
-               <para>Default: Current directory</para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>configuration</code></entry>
-             <entry>
-               Path to the configuration file
-               <para>Default: No value</para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>filter</code></entry>
-             <entry>
-               Path to the filter file
-               <para>Default: No value</para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>reports</code></entry>
-             <entry>
-               A comma separated list of which reports that should be generated.
-               All reports can be selected by specifying "*". The following reports are supported:
-               <itemizedlist>
-                 <listitem>
-                   <para><code>classdependants</code></para>
-                   <para>The "Class Dependants" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>classdependson</code></para>
-                   <para>The "Class Depends On" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>dependants</code></para>
-                   <para>The "Dependants" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>dependson</code></para>
-                   <para>The "Depends On" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>graphviz</code></para>
-                   <para>The "Graphical dependencies" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>packagedependants</code></para>
-                   <para>The "Package Dependants" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>packagedependson</code></para>
-                   <para>The "Package Depends On" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>transitivedependants</code></para>
-                   <para>The "Transitive Dependants" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>transitivedependson</code></para>
-                   <para>The "Transitive Depends On" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>circulardependency</code></para>
-                   <para>The "Circular Dependency" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>classlocation</code></para>
-                   <para>The "Class Location" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>osgi</code></para>
-                   <para>The "OSGi" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>sealed</code></para>
-                   <para>The "Sealed" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>signed</code></para>
-                   <para>The "Signed" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>invalidversion</code></para>
-                   <para>The "Invalid Version" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>multiplejarsclass</code></para>
-                   <para>The "Multiple Classes" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>multiplejarspackage</code></para>
-                   <para>The "Multiple Packages" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>multiplelocations</code></para>
-                   <para>The "Multiple Locations" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>multipleversions</code></para>
-                   <para>The "Multiple Versions" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>unused</code></para>
-                   <para>The "Unused" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>blacklisted</code></para>
-                   <para>The "Blacklisted" report.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>noversion</code></para>
-                   <para>The "No Version" report.</para>
-                 </listitem>
-               </itemizedlist>
-               <para>Default: All reports</para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>classloader</code></entry>
-             <entry>
-               Specifies which classloader structure that should be used when scanning the archives.
-               Can be one of the following:
-               <itemizedlist>
-                 <listitem>
-                   <para><code>org.jboss.tattletale.reporting.classloader.NoopClassLoaderStructure</code></para>
-                   <para>A no-operation classloader structure implementation that does not scope any archives.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>org.jboss.tattletale.reporting.classloader.JBossAS4ClassLoaderStructure</code></para>
-                   <para>A classloader structure implementation that scopes based on JBoss Application Server 4.x directory structures.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>org.jboss.tattletale.reporting.classloader.JBossAS5ClassLoaderStructure</code></para>
-                   <para>A classloader structure implementation that scopes based on JBoss Application Server 5.x directory structures.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>org.jboss.tattletale.reporting.classloader.JBossAS6ClassLoaderStructure</code></para>
-                   <para>A classloader structure implementation that scopes based on JBoss Application Server 6.x directory structures.</para>
-                 </listitem>
-               </itemizedlist>
-               <para>Default: <code>org.jboss.tattletale.reporting.classloader.NoopClassLoaderStructure</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>profiles</code></entry>
-             <entry>
-               Specifies a comma separated list of profiles to resolve against. All profiles can
-               be selected by specifying "*". The following profiles are supported:
-               <itemizedlist>
-                 <listitem>
-                   <para><code>java5</code></para>
-                   <para>The Java 5 API.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>java6</code></para>
-                   <para>The Java 6 API.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>ee5</code></para>
-                   <para>The Java Enterprise Edition 5 API.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>ee6</code></para>
-                   <para>The Java Enterprise Edition 6 API.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>seam22</code></para>
-                   <para>The JBoss Seam 2.2 API.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>cdi10</code></para>
-                   <para>The Contexts and Dependency Injection (CDI) 1.0 API.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>spring25</code></para>
-                   <para>The Spring 2.5 API.</para>
-                 </listitem>
-                 <listitem>
-                   <para><code>spring30</code></para>
-                   <para>The Spring 3.0 API.</para>
-                 </listitem>
-               </itemizedlist>
-               <para>Default: <code>java5, java6</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>excludes</code></entry>
-             <entry>
-               A comma separated list of directories or files that should be excluded from the scan. F.ex.
-               <para><code>**/server/**,myjar.jar</code></para>
-               <para>Default: Empty list</para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>blacklisted</code></entry>
-             <entry>
-               A comma separated list of black listed classes or packages. F.ex.
-               <code>com.mycompany.forinternaluseonly, com.partner.forinternaluseonly</code>
-               <para>Default: Empty list</para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>failOnInfo</code></entry>
-             <entry>
-               Fail the build if a failed INFO report is found
-               <para>Default: <code>false</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>failOnWarn</code></entry>
-             <entry>
-               Fail the build if a failed WARN report is found
-               <para>Default: <code>false</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>failOnError</code></entry>
-             <entry>
-               Fail the build if a failed ERROR report is found
-               <para>Default: <code>false</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>deleteOutputDirectory</code></entry>
-             <entry>
-               Should the output directory be deleted
-               <para>Default: <code>true</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>scan</code></entry>
-             <entry>
-               A comma separated list of file extensions that should be scanned
-               <para>Default: <code>.jar</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>title</code></entry>
-             <entry>
-               A title for index.html
-             </entry>
-           </row>
-           <row>
-             <entry><code>extractpattern</code></entry>
-             <entry>
-               Extract only files matching the pattern from nested archives
-               <para>Default: <code>.*\.(j|w|r)ar$</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>analyzecomponents</code></entry>
-             <entry>
-               Should nested archives be analyzed on component level
-               <para>Default: <code>false</code></para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>bundlepattern</code></entry>
-             <entry>
-               Should class files not packaged in archives inside nested archives be bundled according to the pattern
-               <para>Default: <code>null</code> (which results in <code>WEB-INF/classes</code> for WarScanner)</para>
-             </entry>
-           </row>
-           <row>
-             <entry><code>propertyprefix</code></entry>
-             <entry>
-               Use Ant project properties that begin with the prefix as Tattletale properties
-               (instead of a project-specific jboss-tattletale.properties file)
-               <para>Default: <code>tattletale</code> (so that f.ex. scan list can be changed by
-               <code>&lt;property name="tattletale.scan" value="*"/&gt;</code> in build.xml)</para>
-             </entry>
-           </row>
-         </tbody>
-       </tgroup>
-     </table>
+          </row>
+          <row>
+            <entry><code>configuration</code></entry>
+            <entry>
+              Path to the configuration file
+              <para>Default: No value</para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>filter</code></entry>
+            <entry>
+              Path to the filter file
+              <para>Default: No value</para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>reports</code></entry>
+            <entry>
+              A comma separated list of which reports that should be generated.
+              All reports can be selected by specifying "*". The following reports are supported:
+              <itemizedlist>
+                <listitem>
+                  <para><code>classdependants</code></para>
+                  <para>The "Class Dependants" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>classdependson</code></para>
+                  <para>The "Class Depends On" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>dependants</code></para>
+                  <para>The "Dependants" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>dependson</code></para>
+                  <para>The "Depends On" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>graphviz</code></para>
+                  <para>The "Graphical dependencies" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>packagedependants</code></para>
+                  <para>The "Package Dependants" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>packagedependson</code></para>
+                  <para>The "Package Depends On" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>transitivedependants</code></para>
+                  <para>The "Transitive Dependants" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>transitivedependson</code></para>
+                  <para>The "Transitive Depends On" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>circulardependency</code></para>
+                  <para>The "Circular Dependency" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>classlocation</code></para>
+                  <para>The "Class Location" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>osgi</code></para>
+                  <para>The "OSGi" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>sealed</code></para>
+                  <para>The "Sealed" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>signed</code></para>
+                  <para>The "Signed" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>invalidversion</code></para>
+                  <para>The "Invalid Version" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>multiplejarsclass</code></para>
+                  <para>The "Multiple Classes" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>multiplejarspackage</code></para>
+                  <para>The "Multiple Packages" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>multiplelocations</code></para>
+                  <para>The "Multiple Locations" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>multipleversions</code></para>
+                  <para>The "Multiple Versions" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>unused</code></para>
+                  <para>The "Unused" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>blacklisted</code></para>
+                  <para>The "Blacklisted" report.</para>
+                </listitem>
+                <listitem>
+                  <para><code>noversion</code></para>
+                  <para>The "No Version" report.</para>
+                </listitem>
+              </itemizedlist>
+              <para>Default: All reports</para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>classloader</code></entry>
+            <entry>
+              Specifies which classloader structure that should be used when scanning the archives.
+              Can be one of the following:
+              <itemizedlist>
+                <listitem>
+                  <para><code>org.jboss.tattletale.reporting.classloader.NoopClassLoaderStructure</code></para>
+                  <para>A no-operation classloader structure implementation that does not scope any archives.</para>
+                </listitem>
+                <listitem>
+                  <para><code>org.jboss.tattletale.reporting.classloader.JBossAS4ClassLoaderStructure</code></para>
+                  <para>A classloader structure implementation that scopes based on JBoss Application Server 4.x directory structures.</para>
+                </listitem>
+                <listitem>
+                  <para><code>org.jboss.tattletale.reporting.classloader.JBossAS5ClassLoaderStructure</code></para>
+                  <para>A classloader structure implementation that scopes based on JBoss Application Server 5.x directory structures.</para>
+                </listitem>
+                <listitem>
+                  <para><code>org.jboss.tattletale.reporting.classloader.JBossAS6ClassLoaderStructure</code></para>
+                  <para>A classloader structure implementation that scopes based on JBoss Application Server 6.x directory structures.</para>
+                </listitem>
+              </itemizedlist>
+              <para>Default: <code>org.jboss.tattletale.reporting.classloader.NoopClassLoaderStructure</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>profiles</code></entry>
+            <entry>
+              Specifies a comma separated list of profiles to resolve against. All profiles can
+              be selected by specifying "*". The following profiles are supported:
+              <itemizedlist>
+                <listitem>
+                  <para><code>java5</code></para>
+                  <para>The Java 5 API.</para>
+                </listitem>
+                <listitem>
+                  <para><code>java6</code></para>
+                  <para>The Java 6 API.</para>
+                </listitem>
+                <listitem>
+                  <para><code>ee5</code></para>
+                  <para>The Java Enterprise Edition 5 API.</para>
+                </listitem>
+                <listitem>
+                  <para><code>ee6</code></para>
+                  <para>The Java Enterprise Edition 6 API.</para>
+                </listitem>
+                <listitem>
+                  <para><code>seam22</code></para>
+                  <para>The JBoss Seam 2.2 API.</para>
+                </listitem>
+                <listitem>
+                  <para><code>cdi10</code></para>
+                  <para>The Contexts and Dependency Injection (CDI) 1.0 API.</para>
+                </listitem>
+                <listitem>
+                  <para><code>spring25</code></para>
+                  <para>The Spring 2.5 API.</para>
+                </listitem>
+                <listitem>
+                  <para><code>spring30</code></para>
+                  <para>The Spring 3.0 API.</para>
+                </listitem>
+              </itemizedlist>
+              <para>Default: <code>java5, java6</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>excludes</code></entry>
+            <entry>
+              A comma separated list of directories or files that should be excluded from the scan. F.ex.
+              <para><code>**/server/**,myjar.jar</code></para>
+              <para>Default: Empty list</para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>blacklisted</code></entry>
+            <entry>
+              A comma separated list of black listed classes or packages. F.ex.
+              <code>com.mycompany.forinternaluseonly, com.partner.forinternaluseonly</code>
+              <para>Default: Empty list</para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>failOnInfo</code></entry>
+            <entry>
+              Fail the build if a failed INFO report is found
+              <para>Default: <code>false</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>failOnWarn</code></entry>
+            <entry>
+              Fail the build if a failed WARN report is found
+              <para>Default: <code>false</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>failOnError</code></entry>
+            <entry>
+              Fail the build if a failed ERROR report is found
+              <para>Default: <code>false</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>deleteOutputDirectory</code></entry>
+            <entry>
+              Should the output directory be deleted
+              <para>Default: <code>true</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>scan</code></entry>
+            <entry>
+              A comma separated list of file extensions that should be scanned
+              <para>Default: <code>.jar</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>title</code></entry>
+            <entry>
+              A title for index.html
+            </entry>
+          </row>
+          <row>
+            <entry><code>extractpattern</code></entry>
+            <entry>
+              Extract only files matching the pattern from nested archives
+              <para>Default: <code>.*\.(j|w|r)ar$</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>analyzecomponents</code></entry>
+            <entry>
+              Should nested archives be analyzed on component level
+              <para>Default: <code>false</code></para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>bundlepattern</code></entry>
+            <entry>
+              Should class files not packaged in archives inside nested archives be bundled according to the pattern
+              <para>Default: <code>null</code> (which results in <code>WEB-INF/classes</code> for WarScanner)</para>
+            </entry>
+          </row>
+          <row>
+            <entry><code>propertyprefix</code></entry>
+            <entry>
+              Use Ant project properties that begin with the prefix as Tattletale properties
+              (instead of a project-specific jboss-tattletale.properties file)
+              <para>Default: <code>tattletale</code> (so that f.ex. scan list can be changed by
+              <code>&lt;property name="tattletale.scan" value="*"/&gt;</code> in build.xml)</para>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
 
-     <note>Note that defining an attribute in the task or a property
-     beginning with propertyprefix overrides the setting in the
-     configuration file.</note>
+    <note>Note that defining an attribute in the task or a property
+    beginning with propertyprefix overrides the setting in the
+    configuration file.</note>
 
-     <note>Tattletale-specific Ant project properties are
-     case-sensitive, that is <code>tattletale.convertDotToPic</code>
-     works, but <code>tattletale.convertdottopic</code> does
-     not.</note>
-
-   </section>
+    <note>Tattletale-specific Ant project properties are
+    case-sensitive, that is <code>tattletale.convertDotToPic</code>
+    works, but <code>tattletale.convertdottopic</code> does
+    not.</note>
+  </section>
 
 </chapter>

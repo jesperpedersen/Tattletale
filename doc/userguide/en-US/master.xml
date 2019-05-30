@@ -10,41 +10,41 @@
         <!ENTITY troubleshooting SYSTEM "modules/troubleshooting.xml">
         ]>
 <book lang="en">
-   <bookinfo>
-      <authorgroup>
-        <author><firstname>Jesper</firstname><surname>Pedersen</surname></author>
-      </authorgroup>
+  <bookinfo>
+    <authorgroup>
+      <author><firstname>Jesper</firstname><surname>Pedersen</surname></author>
+    </authorgroup>
 
-      <copyright>
-        <year>2011</year>
-        <holder>Red Hat Middleware</holder>
-      </copyright>
+    <copyright>
+      <year>2011</year>
+      <holder>Red Hat Middleware</holder>
+    </copyright>
 
-      <subtitle>Betraying all your project's naughty little secrets</subtitle>
-      <title>JBoss Tattletale 1.2 User's Guide</title>
+    <subtitle>Betraying all your project's naughty little secrets</subtitle>
+    <title>JBoss Tattletale 1.2 User's Guide</title>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/tattletale_mark_200px.png" align="center" valign="middle"/>
-        </imageobject>
-      </mediaobject>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/tattletale_mark_200px.png" align="center" valign="middle"/>
+      </imageobject>
+    </mediaobject>
 
-   </bookinfo>
+  </bookinfo>
 
-   <toc></toc>
+  <toc></toc>
 
-   &about;
+  &about;
 
-   &introduction;
+  &introduction;
 
-   &gettingstarted;
+  &gettingstarted;
 
-   &ant;
+  &ant;
 
-   &maven;
+  &maven;
 
-   &reports;
+  &reports;
 
-   &troubleshooting;
+  &troubleshooting;
 
 </book>
