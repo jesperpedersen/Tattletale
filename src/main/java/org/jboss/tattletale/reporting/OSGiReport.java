@@ -66,7 +66,7 @@ public class OSGiReport extends AbstractReport
    @Override
    public String getName()
    {
-      return (subreportName.equals("")) ? NAME : NAME + " - " + subreportName;
+      return (subreportName.isEmpty()) ? NAME : NAME + " - " + subreportName;
    }
 
    /**
@@ -76,7 +76,7 @@ public class OSGiReport extends AbstractReport
    @Override
    protected String getIndexLinkName()
    {
-      return (subreportName.equals("")) ? INDEX_LINK_NAME : "Back";
+      return (subreportName.isEmpty()) ? INDEX_LINK_NAME : "Back";
    }
 
    /**

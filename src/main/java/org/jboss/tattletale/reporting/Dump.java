@@ -135,7 +135,7 @@ public class Dump
                                     String outputDir,
                                     String t)
    {
-      if (null == t || t.equals(""))
+      if (null == t || t.isEmpty())
       {
          t = TITLE;
       }

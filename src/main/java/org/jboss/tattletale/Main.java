@@ -466,7 +466,7 @@ public class Main
          classloaderStructure = configuration.getProperty("classloader");
       }
 
-      if (null == classloaderStructure || classloaderStructure.trim().equals(""))
+      if (null == classloaderStructure || classloaderStructure.trim().isEmpty())
       {
          classloaderStructure = DEFAULT_TT_CLS;
       }
@@ -575,7 +575,7 @@ public class Main
          scan = configuration.getProperty("scan");
       }
 
-      if (null == scan || scan.trim().equals(""))
+      if (null == scan || scan.trim().isEmpty())
       {
          scan = DEFAULT_TT_SCAN;
       }
@@ -585,7 +585,7 @@ public class Main
          extractPattern = configuration.getProperty("extractPattern");
       }
 
-      if (null == extractPattern || extractPattern.trim().equals(""))
+      if (null == extractPattern || extractPattern.trim().isEmpty())
       {
          extractPattern = DEFAULT_TT_EXTRACT;
       }
@@ -601,7 +601,7 @@ public class Main
          bundlePattern = configuration.getProperty("bundlePattern");
       }
 
-      if (null != bundlePattern && bundlePattern.trim().equals(""))
+      if (null != bundlePattern && bundlePattern.trim().isEmpty())
       {
          bundlePattern = null;
       }
@@ -1038,14 +1038,14 @@ public class Main
                main.setTitle(arg.substring(arg.indexOf('=') + 1));
                continue;
             }
-            if (source.equals(""))
+            if (source.isEmpty())
             {
                source = arg;
                continue;
             }
             destination = arg;
          }
-         if (source.equals(""))
+         if (source.isEmpty())
          {
             usage();
          }

@@ -150,12 +150,12 @@ public class JBossAS7Profile extends AbstractProfile implements ExtendedProfile
             String moduleIdentifier = "";
             for (String value : line.split(","))
             {
-               if (className.equals(""))
+               if (className.isEmpty())
                {
                   className = value;
                   continue;
                }
-               if (archiveName.equals(""))
+               if (archiveName.isEmpty())
                {
                   archiveName = value;
                   continue;
