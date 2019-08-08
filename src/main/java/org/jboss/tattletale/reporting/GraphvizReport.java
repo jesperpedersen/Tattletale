@@ -78,7 +78,7 @@ public class GraphvizReport extends CLSReport
     */
    public void setConfig(Properties config)
    {
-      enableDot = Boolean.valueOf(config.getProperty("enableDot", "true"));
+      enableDot = Boolean.parseBoolean(config.getProperty("enableDot", "true"));
       graphvizDot = config.getProperty("graphvizDot", "dot");
       graphvizTred = config.getProperty("graphvizTred", "tred");
       convertDotToPic = config.getProperty("convertDotToPic", "svg");
@@ -319,8 +319,8 @@ public class GraphvizReport extends CLSReport
    {
       try
       {
-         ProcessBuilder pb = new ProcessBuilder();
-         pb = pb.command(graphvizDot, "-V");
+         final ProcessBuilder pb = new ProcessBuilder();
+         pb.command(graphvizDot, "-V");
 
          final Process proc = pb.redirectErrorStream(true).start();
 
@@ -350,10 +350,9 @@ public class GraphvizReport extends CLSReport
    {
       try
       {
-         ProcessBuilder pb = new ProcessBuilder();
-         pb = pb.command(graphvizDot, "-T" + convertDotToPic,
-                         dotName, "-o", dotName.replaceFirst("dot$", convertDotToPic));
-         pb = pb.directory(directory);
+         final ProcessBuilder pb = new ProcessBuilder();
+         pb.command(graphvizDot, "-T" + convertDotToPic, dotName,
+               "-o", dotName.replaceFirst("dot$", convertDotToPic)).directory(directory);
 
          final Process proc = pb.redirectErrorStream(true).start();
 
@@ -400,9 +399,8 @@ public class GraphvizReport extends CLSReport
    {
       try
       {
-         ProcessBuilder pb = new ProcessBuilder();
-         pb = pb.command(graphvizTred, dotName);
-         pb = pb.directory(directory);
+         final ProcessBuilder pb = new ProcessBuilder();
+         pb.command(graphvizTred, dotName).directory(directory);
 
          final Process proc = pb.redirectErrorStream(false).start();
 

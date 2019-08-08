@@ -549,7 +549,7 @@ public class Main
          allReports = true;
       }
 
-      if (!allReports && null != reports)
+      if (!allReports)
       {
          reportSet = new HashSet<String>();
 
@@ -696,7 +696,7 @@ public class Main
       }
 
       // Write out report
-      if (null != archives && archives.size() > 0)
+      if (archives.size() > 0)
       {
          final ReportSetBuilder reportSetBuilder = new ReportSetBuilder(destination, allReports, reportSet, filters);
 
@@ -762,20 +762,6 @@ public class Main
       {
          System.err.println("Exception of type: " + e.getClass().toString()
                             + " thrown in loadCustomReports() in org.jboss.tattletale.Main");
-      }
-      finally
-      {
-         if (null != inputStream)
-         {
-            try
-            {
-               inputStream.close();
-            }
-            catch (IOException ioe)
-            {
-               // No op.
-            }
-         }
       }
    }
 

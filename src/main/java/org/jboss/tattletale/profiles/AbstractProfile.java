@@ -102,7 +102,7 @@ public abstract class AbstractProfile implements Profile
       {
          return true;
       }
-      else if (null != subProfiles)
+      else
       {
          for (Profile subProfile : subProfiles)
          {

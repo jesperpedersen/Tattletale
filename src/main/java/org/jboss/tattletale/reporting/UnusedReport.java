@@ -74,7 +74,7 @@ public class UnusedReport extends AbstractReport
             {
                for (String require : a.getRequires())
                {
-                  if (archive.getProvides().keySet().contains(require))
+                  if (archive.getProvides().containsKey(require))
                   {
                      archiveStatus = true;
                      break;

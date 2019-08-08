@@ -72,7 +72,7 @@ public class BlackListedReport extends AbstractReport
          SortedMap<String, SortedSet<String>> blacklisted = getBlackListedDeps(archive);
          boolean filtered = isFiltered(archive.getName());
 
-         if (null != blacklisted && blacklisted.size() > 0)
+         if (blacklisted.size() > 0)
          {
             if (!filtered)
             {
