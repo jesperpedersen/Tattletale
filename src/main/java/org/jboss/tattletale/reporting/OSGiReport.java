@@ -138,7 +138,6 @@ public class OSGiReport extends AbstractReport
             if (anOsgiInformation.length() <= 69)
             {
                mbw.write(anOsgiInformation);
-               mbw.write(Dump.newLine());
             }
             else
             {
@@ -158,8 +157,8 @@ public class OSGiReport extends AbstractReport
                      count = 2;
                   }
                }
-               mbw.write(Dump.newLine());
             }
+            mbw.write(Dump.newLine());
          }
       }
 
