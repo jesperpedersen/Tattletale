@@ -26,9 +26,9 @@
   <info organisation="org.jboss.tattletale" 
         module="tattletale"
         revision="${version}">
-    <license name="lgpl" url="http://repository.jboss.org/licenses/lgpl.txt"/>
-    <repository name="jboss" url="http://repository.jboss.org"/>
-    <description homepage="http://www.jboss.org/tattletale">
+    <license name="lgpl" url="https://repository.jboss.org/licenses/lgpl.txt"/>
+    <repository name="jboss" url="https://repository.jboss.org"/>
+    <description homepage="https://tattletale.jboss.org/">
       Tattletale - a software quality tool
     </description>
   </info>

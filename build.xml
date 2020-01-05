@@ -29,7 +29,7 @@
     <property name="version" value="${major}.${minor}.${patch}.${type}"/>
 
     <property name="java.target" value="1.6"/>
-    <property name="java.api.doc" value="http://docs.oracle.com/javase/6/docs/api/"/>
+    <property name="java.api.doc" value="https://docs.oracle.com/javase/6/docs/api/"/>
 
     <property name="tattletale.jar" value="tattletale.jar"/>
     <property name="tattletale-sources.jar" value="tattletale-sources.jar"/>
@@ -47,9 +47,9 @@
     <!-- =================================
          Repositories
          ================================= -->
-    <property name="central.repo" value="http://repo1.maven.org/maven2"/>
-    <property name="jboss.repo" value="http://repository.jboss.org/nexus/content/groups/public/"/>
-    <property name="snapshots.repo" value="http://snapshots.jboss.org/maven2"/>
+    <property name="central.repo" value="https://repo1.maven.org/maven2"/>
+    <property name="jboss.repo" value="https://repository.jboss.org/nexus/content/groups/public/"/>
+    <property name="snapshots.repo" value="https://snapshots.jboss.org/maven2"/>
 
     <!-- =================================
          Maven repository settings
@@ -69,7 +69,7 @@
     <!-- =================================
          Ivy
          ================================= -->
-    <property name="ivy.version" value="2.4.0"/>
+    <property name="ivy.version" value="2.5.0"/>
     <property name="ivy.dir" value="${user.home}/.ivy2/cache/org.apache.ivy/jars"/>
     <property name="ivy.jar.name" value="ivy-${ivy.version}.jar"/>
     <available property="has.ivy" file="${ivy.dir}/${ivy.jar.name}" type="file"/>
@@ -106,7 +106,7 @@
     <target name="get.ivy" unless="has.ivy">
         <mkdir dir="${ivy.dir}"/>
         <get usetimestamp="true"
-             src="https://repository.apache.org/content/repositories/releases/org/apache/ivy/ivy/${ivy.version}/${ivy.jar.name}"
+             src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/${ivy.jar.name}"
              skipexisting="true"
              dest="${ivy.dir}/${ivy.jar.name}"/>
     </target>
@@ -254,7 +254,7 @@
                  doctitle="JBoss Tattletale"
                  use="true"
                  classpathref="class.path"
-                 bottom="Copyright &amp;copy; 2011 JBoss (http://www.jboss.com/)">
+                 bottom="Copyright &amp;copy; 2011 JBoss (http://www.jboss.org/)">
             <packageset dir="${build.dir}" defaultexcludes="yes"/>
             <packageset dir="src/main/java" defaultexcludes="yes">
                 <exclude name="**/ant/**"/>
@@ -274,7 +274,7 @@
                  doctitle="JBoss Tattletale"
                  use="true"
                  classpathref="class.path"
-                 bottom="Copyright &amp;copy; 2011 JBoss (http://www.jboss.com/)">
+                 bottom="Copyright &amp;copy; 2011 JBoss (http://www.jboss.org/)">
             <packageset dir="${build.dir}" defaultexcludes="yes"/>
             <packageset dir="src/main/java" defaultexcludes="yes">
                 <include name="**/ant/**"/>
@@ -294,7 +294,7 @@
                  doctitle="JBoss Tattletale"
                  use="true"
                  classpathref="class.path"
-                 bottom="Copyright &amp;copy; 2011 JBoss (http://www.jboss.com/)">
+                 bottom="Copyright &amp;copy; 2011 JBoss (http://www.jboss.org/)">
             <packageset dir="${build.dir}" defaultexcludes="yes"/>
             <packageset dir="src/main/java" defaultexcludes="yes">
                 <include name="**/maven/**"/>
@@ -322,7 +322,7 @@
                  doctitle="JBoss Tattletale"
                  use="true"
                  classpathref="class.path"
-                 bottom="Copyright &amp;copy; 2011 JBoss (http://www.jboss.com/)">
+                 bottom="Copyright &amp;copy; 2011 JBoss (http://www.jboss.org/)">
              <link offline="true" href="${java.api.doc}" packagelistLoc="${java.home}/../docs/api"/>
         </javadoc>
         <ant dir="doc/userguide" target="pdf"/>
