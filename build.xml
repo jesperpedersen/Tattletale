@@ -106,7 +106,7 @@
     <target name="get.ivy" unless="has.ivy">
         <mkdir dir="${ivy.dir}"/>
         <get usetimestamp="true"
-             src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/${ivy.jar.name}"
+             src="${central.repo}/org/apache/ivy/ivy/${ivy.version}/${ivy.jar.name}"
              skipexisting="true"
              dest="${ivy.dir}/${ivy.jar.name}"/>
     </target>
