@@ -21,7 +21,7 @@
 -->
 <ivysettings>
   <!-- defaults -->
-  <property name="version.ant" value="1.9.14" override="false"/>
+  <property name="version.ant" value="1.9.15" override="false"/>
   <property name="version.maven" value="3.2.5" override="false"/>
   <property name="version.javassist" value="3.23.1-GA" override="false"/>
   <property name="central.repo" value="https://repo1.maven.org/maven2" override="false"/>

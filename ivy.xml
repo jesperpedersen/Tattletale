@@ -35,7 +35,6 @@
 
   <configurations defaultconfmapping="core->default;tattletale->default;tattletale-ant->default;tattletale-maven->default">
     <conf name="core" transitive="false"/>
-
     <conf name="tattletale" transitive="false"/>
     <conf name="tattletale-ant" transitive="false"/>
     <conf name="tattletale-maven" transitive="false"/>

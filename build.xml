@@ -77,9 +77,9 @@
     <!-- =================================
          Versions
          ================================= -->
-    <property name="version.ant" value="1.9.14"/>
-    <property name="version.javassist" value="3.23.1-GA"/>
+    <property name="version.ant" value="1.9.15"/>
     <property name="version.maven" value="3.2.5"/>
+    <property name="version.javassist" value="3.23.1-GA"/>
     <property name="version.checkstyle" value="6.1.1"/>
 
     <!-- =================================================================== -->
