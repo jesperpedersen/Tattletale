@@ -24,15 +24,15 @@ package org.jboss.tattletale.profiles;
 
 /**
  * Interface that will define what is required from custom, extended profiles.
+ *
  * @author Navin Surtani
  */
 public interface ExtendedProfile extends Profile
 {
    /**
     * Simple get call to obtain the module identifier based on the name passed.
-    *
     * @param   clazz          - class name.
     * @return                 - the module identifier.
     */
-   public String getModuleIdentifier(String clazz);
+   String getModuleIdentifier(String clazz);
 }

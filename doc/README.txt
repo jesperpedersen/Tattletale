@@ -1,39 +1,43 @@
 JBoss Tattletale
 ================
 
-JBoss Tattletale is a tool that can help you get an overview of the project you are working on
-or a product that you depend on.
+JBoss Tattletale is a tool that can help you get an overview of the
+project you are working on or a product that you depend on.
 
 The tool will provide you with reports that can help you
 
-* Identify dependencies between JAR files
+* Identify dependencies between archives
 * Find missing classes from the classpath
-* Spot if a class/package is located in multiple JAR files
-* Spot if the same JAR file is located in multiple locations
-* With a list of what each JAR file requires and provides
+* Spot if a class/package is located in multiple archives
+* Spot if the same archive is located in multiple locations
+* List what each archive requires and provides
 * Verify the SerialVersionUID of a class
-* Find similar JAR files that have different version numbers
-* Find JAR files without a version number
-* Find unused JAR files
-* Identify sealed / signed JAR archives
-* Locate a class in a JAR file
+* Find similar archives that have different version numbers
+* Find archives without a version number
+* Find unused archives
+* Identify sealed/signed archives
+* Locate a class in an archive
 * Get the OSGi status of your project
+* Identify blacklisted API usage
 
-JBoss Tattletale will recursive scan the directory pass as the argument for JAR files and then
-build the reports as HTML files.
+JBoss Tattletale will recursively scan the hash-separated list of
+directories for archives and/or analyse a list of archives passed as
+the argument and then build the reports as HTML files.
 
 The main HTML file is: index.html
 
-JBoss Tattletale is licensed under GNU Lesser General Public License (LGPL) version 2.1 or later.
+JBoss Tattletale is licensed under GNU Lesser General Public License
+(LGPL) version 2.1 or later.
 
-We hope that JBoss Tattletale will help you in your development tasks ! 
+We hope that JBoss Tattletale will help you in your development tasks!
 
 
 Quick start:
 ------------
-java -Xmx512m -jar tattletale.jar [-exclude=<excludes>] <scan-directory> [output-directory]
+java -jar tattletale.jar [-title=<title>] [-components[=<regex>]] [-exclude=<excludes>] <input>[#<input>]* [<output-directory>]
 
-Output: Analysis reports generate in current directory if no output-directory set.
+Analysis reports are generated in current directory if no
+output-directory is set.
 
 
 User guide:

@@ -22,20 +22,14 @@
 
 package org.jboss.tattletale.analyzers;
 
-import org.jboss.tattletale.core.Archive;
-import org.jboss.tattletale.core.ClassesArchive;
-import org.jboss.tattletale.core.Location;
-import org.jboss.tattletale.core.WarArchive;
-import org.jboss.tattletale.profiles.Profile;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,87 +40,159 @@ import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jboss.tattletale.core.Archive;
+import org.jboss.tattletale.core.ClassesArchive;
+import org.jboss.tattletale.core.JarArchive;
+import org.jboss.tattletale.core.Location;
+import org.jboss.tattletale.core.WarArchive;
+import org.jboss.tattletale.profiles.Profile;
 
 /**
- * Class that would be used to scan .war files.
+ * Scanner for .war (and .rar) files.
  *
  * @author Navin Surtani
  */
-
 public class WarScanner extends AbstractScanner
 {
+   /** Field extractPattern */
+   private final String extractPattern;
+
+   /** Field bundlePattern */
+   private final Pattern bundlePattern;
+
+   /** Final placeholderClasses */
+   private final boolean placeholderClasses;
+
+   /** Field CLASSES_DEFAULT_PATTERN. (value is ""WEB-INF/classes"") */
+   private static final String CLASSES_DEFAULT_PATTERN = "WEB-INF/classes";
+
    /**
-    * Scan a .war archive
-    * @param war        The file
-    * @return The archive
+    * Constructor
     */
-   public Archive scan(File war)
+   public WarScanner()
    {
-      return scan(war, null, null, null);
+      extractPattern = ".*";
+      bundlePattern = Pattern.compile("(" + CLASSES_DEFAULT_PATTERN + ")/");
+      placeholderClasses = true;
+   }
+
+   /**
+    * Constructor
+    * @param extractPattern select matching entries
+    */
+   public WarScanner(String extractPattern)
+   {
+      this.extractPattern = extractPattern;
+      bundlePattern = Pattern.compile("(" + CLASSES_DEFAULT_PATTERN + ")/");
+      placeholderClasses = true;
+   }
+
+   /**
+    * Constructor
+    * @param extractPattern select matching entries
+    * @param pattern bundle matching entries into JarArchives (ClassArchive is a placeholder)
+    */
+   public WarScanner(String extractPattern, String pattern)
+   {
+      this.extractPattern = extractPattern;
+      placeholderClasses = false;
+      if (null == pattern)
+      {
+         bundlePattern = Pattern.compile("(" + CLASSES_DEFAULT_PATTERN + ")/");
+      }
+      else
+      {
+         bundlePattern = Pattern.compile("(" + CLASSES_DEFAULT_PATTERN + "/(" + pattern + "))/");
+      }
    }
 
    /**
     * Scan a .war archive
-    *
-    * @param war        The file
+    * @param war The war file to be scanned
+    * @return The archive
+    * @see org.jboss.tattletale.analyzers.ArchiveScanner#scan(File)
+    */
+   public Archive scan(File war)
+   {
+      return this.scan(war, null, null, null);
+   }
+
+   /**
+    * Scan a .war archive
+    * @param war         The war file
     * @param gProvides   The global provides map
     * @param known       The set of known archives
     * @param blacklisted The set of black listed packages
     * @return The archive
+    * @see org.jboss.tattletale.analyzers.ArchiveScanner#scan(File, Map, List, Set)
     */
    public Archive scan(File war, Map<String, SortedSet<String>> gProvides, List<Profile> known,
                        Set<String> blacklisted)
    {
-      if (war == null || !war.exists())
+      if (null == war || !war.exists())
+      {
          return null;
+      }
 
       WarArchive warArchive = null;
-      List<Archive> subArchiveList = new ArrayList<Archive>();
-      ArchiveScanner jarScanner = new JarScanner();
+      final List<Archive> subArchiveList = new ArrayList<Archive>();
+      final ArchiveScanner jarScanner = new JarScanner();
       JarFile warFile = null;
-      String name = war.getName();
+      final String name = war.getName();
+      Extractor xt = null;
+
       try
       {
+         xt = new Extractor(war, extractPattern);
+         xt.extract();
+         warFile = xt.getArchive();
+         final File extractedDir = xt.getTarget();
 
-         String canonicalPath = war.getCanonicalPath();
-         warFile = new JarFile(war);
-         File extractedDir = war.isFile() ? Extractor.extract(warFile) : war;
          Integer classVersion = null;
-         SortedSet<String> requires = new TreeSet<String>();
-         SortedMap<String, Long> provides = new TreeMap<String, Long>();
-         SortedSet<String> profiles = new TreeSet<String>();
-         SortedMap<String, SortedSet<String>> classDependencies = new TreeMap<String, SortedSet<String>>();
-         SortedMap<String, SortedSet<String>> packageDependencies = new TreeMap<String, SortedSet<String>>();
-         SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
          List<String> lSign = null;
+         final Map<String, ClassScanner> classBundles = new HashMap<String, ClassScanner>();
 
-         Enumeration<JarEntry> warEntries = warFile.entries();
-
-         while (warEntries.hasMoreElements())
+         for (JarEntry warEntry : Collections.list(warFile.entries()))
          {
-            JarEntry warEntry = warEntries.nextElement();
             String entryName = warEntry.getName();
             InputStream entryStream = null;
             if (entryName.endsWith(".class"))
             {
+               Matcher match = bundlePattern.matcher(entryName);
+               String bundleName = null;
+               while (match.find())
+               {
+                  bundleName = match.group(1);
+               }
+               if (null == bundleName)
+               {
+                  bundleName = "unmatched_" + name;
+               }
+
+               ClassScanner cs = (!classBundles.isEmpty() && classBundles.containsKey(bundleName)) ?
+                   classBundles.get(bundleName) : new ClassScanner(bundleName);
+
                try
                {
                   entryStream = warFile.getInputStream(warEntry);
-                  classVersion = scanClasses(entryStream, blacklisted, known, classVersion, provides,
-                        requires, profiles, classDependencies, packageDependencies, blacklistedDependencies);
-
+                  classVersion = cs.scan(entryStream, known, blacklisted);
                }
-               catch (Exception openException)
+               catch (IOException openException)
                {
                   openException.printStackTrace();
                }
                finally
                {
-                  if (entryStream != null)
+                  if (null != entryStream)
                   {
                      entryStream.close();
                   }
                }
+
+               classBundles.put(bundleName, cs);
             }
             else if (entryName.contains("META-INF") && entryName.endsWith(".SF"))
             {
@@ -138,19 +204,17 @@ public class WarScanner extends AbstractScanner
                   InputStreamReader isr = new InputStreamReader(is);
                   LineNumberReader lnr = new LineNumberReader(isr);
 
-                  if (lSign == null)
+                  if (null == lSign)
                   {
                      lSign = new ArrayList<String>();
                   }
 
-                  String s = lnr.readLine();
-                  while (s != null)
+                  for (String line; (line = lnr.readLine()) != null;)
                   {
-                     lSign.add(s);
-                     s = lnr.readLine();
+                     lSign.add(line);
                   }
                }
-               catch (Exception ie)
+               catch (IOException ioe)
                {
                   // Ignore
                }
@@ -158,7 +222,7 @@ public class WarScanner extends AbstractScanner
                {
                   try
                   {
-                     if (is != null)
+                     if (null != is)
                      {
                         is.close();
                      }
@@ -173,76 +237,127 @@ public class WarScanner extends AbstractScanner
             {
                File jarFile = new File(extractedDir.getCanonicalPath(), entryName);
                Archive jarArchive = jarScanner.scan(jarFile, gProvides, known, blacklisted);
-               if (jarArchive != null)
+               if (null != jarArchive)
+               {
                   subArchiveList.add(jarArchive);
+               }
             }
          }
-         if (provides.size() == 0 && subArchiveList.size() == 0)
-         {
-            return null;
-         }
-
 
          String version = null;
          List<String> lManifest = null;
-         Manifest manifest = warFile.getManifest();
+         final Manifest manifest = warFile.getManifest();
 
-         if (manifest != null)
+         if (null != manifest)
          {
             version = super.versionFromManifest(manifest);
             lManifest = super.readManifest(manifest);
          }
 
-         Location location = new Location(canonicalPath, version);
+         final SortedSet<String> requires = new TreeSet<String>();
+         final SortedMap<String, Long> provides = new TreeMap<String, Long>();
+         final SortedSet<String> profiles = new TreeSet<String>();
+         final SortedMap<String, SortedSet<String>> classDependencies = new TreeMap<String, SortedSet<String>>();
+         final SortedMap<String, SortedSet<String>> packageDependencies = new TreeMap<String, SortedSet<String>>();
+         final SortedMap<String, SortedSet<String>> blacklistedDependencies = new TreeMap<String, SortedSet<String>>();
 
-         if (subArchiveList.size() > 0 && classVersion == null)
+         for (ClassScanner cs : classBundles.values())
+         {
+            final Location location = new Location(war.getCanonicalPath() + cs.getLocation(), version);
+            if (placeholderClasses)
+            {
+               // ClassesArchive is a placeholder that is excluded from analysis
+               final ClassesArchive classesArchive = new ClassesArchive(cs.getName().replace(".jar", ""),
+                                                                        cs.getClassVersion(), lManifest, lSign,
+                                                                        cs.getRequires(), cs.getProvides(),
+                                                                        cs.getClassDependencies(),
+                                                                        cs.getPackageDependencies(),
+                                                                        cs.getBlacklistedDependencies(), location);
+               subArchiveList.add(classesArchive);
+            }
+            else
+            {
+               final JarArchive classesArchive = new JarArchive(cs.getName(), cs.getClassVersion(), lManifest, lSign,
+                                                                cs.getRequires(), cs.getProvides(),
+                                                                cs.getClassDependencies(),
+                                                                cs.getPackageDependencies(),
+                                                                cs.getBlacklistedDependencies(), location);
+               subArchiveList.add(classesArchive);
+            }
+
+            requires.addAll(cs.getRequires());
+
+            for (Map.Entry<String, Long> entry : cs.getProvides().entrySet())
+            {
+               String className = entry.getKey();
+               if (null != gProvides)
+               {
+                  SortedSet<String> ss = gProvides.get(className);
+                  if (null == ss)
+                  {
+                     ss = new TreeSet<String>();
+                  }
+                  if (placeholderClasses)
+                  {
+                     ss.add(name);
+                  }
+                  else
+                  {
+                     ss.add(cs.getName());
+                  }
+                  gProvides.put(className, ss);
+               }
+               if (!provides.containsKey(className))
+               {
+                  provides.put(className, entry.getValue());
+                  requires.remove(className);
+               }
+               else
+               {
+                  System.err.println("Class " + className + " already seen!");
+               }
+            }
+
+            profiles.addAll(cs.getProfiles());
+
+            addDependencies(classDependencies, cs.getClassDependencies(), "Dependencies");
+            addDependencies(packageDependencies, cs.getPackageDependencies(), "Package dependencies");
+            addDependencies(blacklistedDependencies, cs.getBlacklistedDependencies(), "Blacklisted dependencies");
+         }
+
+         if (0 == provides.size() && 0 == subArchiveList.size())
+         {
+            return null;
+         }
+
+         // Obtain the class version from the first archive in the list of subarchives if it is null.
+         if (subArchiveList.size() > 0 && null == classVersion)
          {
             classVersion = subArchiveList.get(0).getVersion();
          }
-         if (classVersion == null)
-            classVersion = Integer.valueOf(0);
-
-         String classesName = name + "/WEB-INF/classes";
-         ClassesArchive classesArchive = new ClassesArchive(classesName, classVersion, lManifest, lSign, requires,
-                                                            provides, classDependencies, packageDependencies, 
-                                                            blacklistedDependencies, location);
-         subArchiveList.add(classesArchive);
+         if (null == classVersion)
+         {
+            classVersion = 0;
+         }
 
          warArchive = new WarArchive(name, classVersion, lManifest, lSign, requires, provides,
                                      classDependencies, packageDependencies, blacklistedDependencies,
-                                     location, subArchiveList);
+                                     new Location(war.getCanonicalPath(), version), subArchiveList);
          super.addProfilesToArchive(warArchive, profiles);
-
-         Iterator<String> it = provides.keySet().iterator();
-         while (it.hasNext())
-         {
-            String provide = it.next();
-
-            if (gProvides != null)
-            {
-               SortedSet<String> ss = gProvides.get(provide);
-               if (ss == null)
-               {
-                  ss = new TreeSet<String>();
-               }
-               ss.add(warArchive.getName());
-               gProvides.put(provide, ss);
-            }
-            requires.remove(provide);
-         }
       }
-      catch (Exception e)
+      catch (IOException ioe)
       {
-         System.err.println("Scan: " + e.getMessage());
-         e.printStackTrace(System.err);
+         System.err.println("Scan: " + ioe.getMessage());
+         ioe.printStackTrace(System.err);
       }
       finally
       {
          try
          {
-            if (warFile != null)
+            if (null != warFile)
             {
                warFile.close();
+               xt.deleteTempTarget();
             }
          }
          catch (IOException ioe)
@@ -252,5 +367,4 @@ public class WarScanner extends AbstractScanner
       }
       return warArchive;
    }
-
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC
-  "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
-  "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+  "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+  "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
   <property name="basedir" value="${basedir}"/>
@@ -89,7 +89,9 @@
     </module>
 
     <!-- Avoid inner assignments -->
-    <module name="InnerAssignment"/>
+    <module name="InnerAssignment">
+       <property name="tokens" value="BAND_ASSIGN,BOR_ASSIGN,BSR_ASSIGN,BXOR_ASSIGN,DIV_ASSIGN,MINUS_ASSIGN,MOD_ASSIGN,PLUS_ASSIGN,SL_ASSIGN,SR_ASSIGN,STAR_ASSIGN"/>
+    </module>
 
     <!-- Don't allow imports from the sun.* package hierarchy -->
     <module name="IllegalImport"/>
@@ -110,7 +112,7 @@
     <module name="SimplifyBooleanReturn"/>
 
     <module name="ImportOrder">
-      <property name="groups" value="org.jboss.tattletale,java,javax,org.jboss"/>
+      <property name="groups" value="java,javax,org.apache,javassist,org.jboss.tattletale,org.jboss"/>
       <property name="ordered" value="true"/>
       <property name="separated" value="true"/>
     </module>

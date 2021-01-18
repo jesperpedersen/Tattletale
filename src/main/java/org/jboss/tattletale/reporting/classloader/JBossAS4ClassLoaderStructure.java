@@ -21,16 +21,15 @@
  */
 package org.jboss.tattletale.reporting.classloader;
 
+import java.io.File;
+
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.Location;
-
-import java.io.File;
-import java.util.SortedSet;
 
 /**
  * A classloader structure class that represents the JBoss Application Server 4.x
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class JBossAS4ClassLoaderStructure extends JBossASClassLoaderStructure
 {
@@ -41,53 +40,50 @@ public class JBossAS4ClassLoaderStructure extends JBossASClassLoaderStructure
 
    /**
     * Can one archive see the other
-    *
     * @param from The from archive
     * @param to   The to archive
     * @return True if from can see to; otherwise false
+    * @see org.jboss.tattletale.reporting.classloader.ClassLoaderStructure#isVisible(Archive, Archive)
     */
    public boolean isVisible(Archive from, Archive to)
    {
-      SortedSet<Location> fromLocations = from.getLocations();
-      SortedSet<Location> toLocations = to.getLocations();
-
-      for (Location fromLocation : fromLocations)
+      for (Location fromLocation : from.getLocations())
       {
          String fromPath = fromLocation.getFilename();
 
          int fIdx = fromPath.indexOf(from.getName());
-         String f = fromPath.substring(0, fIdx);
-         f = stripPrefix(f);
+         String fp = fromPath.substring(0, fIdx);
+         fp = stripPrefix(fp);
 
-         if (!f.startsWith("docs"))
+         if (!fp.startsWith("docs"))
          {
-            for (Location toLocation : toLocations)
+            for (Location toLocation : to.getLocations())
             {
                String toPath = toLocation.getFilename();
 
                int tIdx = toPath.indexOf(to.getName());
-               String t = toPath.substring(0, tIdx);
-               t = stripPrefix(t);
+               String tp = toPath.substring(0, tIdx);
+               tp = stripPrefix(tp);
 
                // Same directory
-               if (f.equals(t))
+               if (fp.equals(tp))
                {
                   return true;
                }
 
                // bin and client can only see same directory
-               if (!f.startsWith("bin") && !f.startsWith("client"))
+               if (!fp.startsWith("bin") && !fp.startsWith("client"))
                {
                   // Top-level bin and lib is always visible
-                  if (t.startsWith("bin") || t.startsWith("lib"))
+                  if (tp.startsWith("bin") || tp.startsWith("lib"))
                   {
                      return true;
                   }
 
-                  if (f.startsWith("lib"))
+                  if (fp.startsWith("lib"))
                   {
                      // A sub-directory can see higher level or bin
-                     if (f.startsWith(t) || t.startsWith("bin"))
+                     if (fp.startsWith(tp) || tp.startsWith("bin"))
                      {
                         return true;
                      }
@@ -95,26 +91,26 @@ public class JBossAS4ClassLoaderStructure extends JBossASClassLoaderStructure
                   else
                   {
                      // Exclude client from target
-                     if (!t.startsWith("client"))
+                     if (!tp.startsWith("client"))
                      {
                         // A sub-directory can see higher level
-                        if (f.startsWith(t))
+                        if (fp.startsWith(tp))
                         {
                            return true;
                         }
 
                         // server/xxx/lib directories can only see same directory at this point
-                        if (!f.endsWith("lib" + File.separator))
+                        if (!fp.endsWith("lib" + File.separator))
                         {
-                           int deploy = f.indexOf("deploy");
+                           int deploy = fp.indexOf("deploy");
 
                            // server/xxx/deploy
                            if (deploy != -1)
                            {
-                              String config = f.substring(0, deploy);
+                              String config = fp.substring(0, deploy);
 
                               // server/xxx/lib
-                              if (t.equals(config + "lib" + File.separator))
+                              if (tp.equals(config + "lib" + File.separator))
                               {
                                  return true;
                               }
@@ -132,8 +128,7 @@ public class JBossAS4ClassLoaderStructure extends JBossASClassLoaderStructure
 
    /**
     * Strip prefix
-    *
-    * @param input The inout string
+    * @param input The input string
     * @return The result
     */
    private String stripPrefix(String input)

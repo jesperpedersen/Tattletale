@@ -35,4 +35,3 @@
     <xsl:param name="html.stylesheet" select="'css/jbossorg.css'"/>
 
 </xsl:stylesheet>
-

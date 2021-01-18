@@ -29,25 +29,38 @@ import java.util.Properties;
 /**
  * Helper class for handling configuration
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class Configuration
 {
+   /** Configuration */
+   private Properties config;
+
    /**
     * Constructor
+    * @param config Properties to encapsulate
     */
-   private Configuration()
+   public Configuration(Properties config)
    {
+      this.config = config;
+   }
+
+   /**
+    * Retrieve the configuration properties
+    * @return encapsulated Properties
+    */
+   public Properties getConfiguration()
+   {
+      return config;
    }
 
    /**
     * Load configuration from a file
     * @param fileName The file name
-    * @return The properties
     */
-   public static Properties loadFromFile(String fileName)
+   public void loadFromFile(String fileName)
    {
-      Properties properties = new Properties();
+      final Properties properties = new Properties();
 
       FileInputStream fis = null;
       try
@@ -61,7 +74,7 @@ public class Configuration
       }
       finally
       {
-         if (fis != null)
+         if (null != fis)
          {
             try
             {
@@ -74,22 +87,21 @@ public class Configuration
          }
       }
 
-      return properties;
+      addConfig(properties);
    }
 
    /**
     * Load configuration values specified from either a system property,
     * a file or the classloader
     * @param key The configuration key
-    * @return The properties
     */
-   public static Properties load(String key)
+   public void load(String key)
    {
-      Properties properties = new Properties();
-      String propertiesFile = System.getProperty(key);
+      final Properties properties = new Properties();
+      final String propertiesFile = System.getProperty(key);
       boolean loaded = false;
 
-      if (propertiesFile != null)
+      if (null != propertiesFile)
       {
          FileInputStream fis = null;
          try
@@ -104,7 +116,7 @@ public class Configuration
          }
          finally
          {
-            if (fis != null)
+            if (null != fis)
             {
                try
                {
@@ -126,13 +138,13 @@ public class Configuration
             properties.load(fis);
             loaded = true;
          }
-         catch (IOException ignore)
+         catch (IOException ioe)
          {
             // Nothing to do
          }
          finally
          {
-            if (fis != null)
+            if (null != fis)
             {
                try
                {
@@ -150,18 +162,17 @@ public class Configuration
          InputStream is = null;
          try
          {
-            ClassLoader cl = Configuration.class.getClassLoader();
+            final ClassLoader cl = Configuration.class.getClassLoader();
             is = cl.getResourceAsStream(key);
             properties.load(is);
-            loaded = true;
          }
-         catch (Exception ie)
+         catch (IOException ioe)
          {
             // Properties file not found
          }
          finally
          {
-            if (is != null)
+            if (null != is)
             {
                try
                {
@@ -174,8 +185,27 @@ public class Configuration
             }
          }
       }
+      addConfig(properties);
+   }
 
-      return properties;
+   /**
+    * Method addConfig.
+    * @param cfg Properties
+    */
+   private void addConfig(Properties cfg)
+   {
+      if (null == config)
+      {
+         config = cfg;
+         return;
+      }
+
+      for (String name : cfg.stringPropertyNames())
+      {
+         if (!config.containsKey(name))
+         {
+            config.setProperty(name, cfg.getProperty(name));
+         }
+      }
    }
 }
-

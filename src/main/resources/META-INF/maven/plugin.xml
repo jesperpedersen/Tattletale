@@ -1,5 +1,5 @@
 <plugin>
-  <description></description>
+  <description>Tattletale analyser</description>
   <groupId>org.jboss.tattletale</groupId>
   <artifactId>tattletale-maven</artifactId>
   <version>@VERSION.TATTLETALE@</version>
@@ -9,7 +9,7 @@
   <mojos>
     <mojo>
       <goal>report</goal>
-      <description>Execututes Tattletale.</description>
+      <description>Executes Tattletale.</description>
       <requiresDirectInvocation>false</requiresDirectInvocation>
       <requiresProject>false</requiresProject>
       <requiresReports>false</requiresReports>

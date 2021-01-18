@@ -23,23 +23,23 @@ package org.jboss.tattletale;
 
 /**
  * The version class
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class Version
 {
 
    /** The vendor */
-   public static final String VENDOR = "JBoss"; 
-   
+   public static final String VENDOR = "JBoss";
+  
    /** The product */
-   public static final String PRODUCT = "Tattletale"; 
-   
+   public static final String PRODUCT = "Tattletale";
+  
    /** The version */
    public static final String VERSION = "@VERSION@";
-   
+  
    /** Full version */
    public static final String FULL_VERSION = VENDOR + " " + PRODUCT + " " + VERSION;
-   
+  
    /**
     * Constructor
     */

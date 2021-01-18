@@ -26,22 +26,21 @@ import java.io.Serializable;
 /**
  * Location
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
-public class Location implements Serializable, Comparable
+public class Location implements Serializable, Comparable<Location>
 {
    /** SerialVersionUID */
    static final long serialVersionUID = 5772882935036035107L;
 
    /** The filename */
-   private String filename;
+   private final String filename;
 
    /** Version */
-   private String version;
+   private final String version;
 
    /**
     * Constructor
-    *
     * @param filename The filename
     * @param version  The version
     */
@@ -53,7 +52,6 @@ public class Location implements Serializable, Comparable
 
    /**
     * Get the filename
-    *
     * @return The value
     */
    public String getFilename()
@@ -63,7 +61,6 @@ public class Location implements Serializable, Comparable
 
    /**
     * Get the version
-    *
     * @return The value
     */
    public String getVersion()
@@ -73,19 +70,16 @@ public class Location implements Serializable, Comparable
 
    /**
     * Comparable
-    *
-    * @param o The other object
+    * @param location The other location
     * @return The compareTo value
     */
-   public int compareTo(Object o)
+   public int compareTo(Location location)
    {
-      Location l = (Location) o;
+      int result = filename.compareTo(location.getFilename());
 
-      int result = filename.compareTo(l.getFilename());
-
-      if (result == 0)
+      if (0 == result)
       {
-         result = (version != null ? version.compareTo(l.getVersion()) : 0);
+         result = (null != version) ? version.compareTo(location.getVersion()) : 0;
       }
 
       return result;
@@ -93,25 +87,17 @@ public class Location implements Serializable, Comparable
 
    /**
     * Equals
-    *
     * @param obj The other object
     * @return True if equals; otherwise false
     */
    public boolean equals(Object obj)
    {
-      if (obj == null || !(obj instanceof Location))
-      {
-         return false;
-      }
-
-      Location l = (Location) obj;
-
-      return filename.equals(l.getFilename()) && (version != null ? version.equals(l.getVersion()) : true);
+      return obj instanceof Location && filename.equals(((Location) obj).getFilename())
+              && (null == version || version.equals(((Location) obj).getVersion()));
    }
 
    /**
     * Hash code
-    *
     * @return The hash code
     */
    public int hashCode()
@@ -120,7 +106,7 @@ public class Location implements Serializable, Comparable
 
       hash += 31 * filename.hashCode();
 
-      if (version != null)
+      if (null != version)
       {
          hash += 31 * version.hashCode();
       }
@@ -130,25 +116,16 @@ public class Location implements Serializable, Comparable
 
    /**
     * String representation
-    *
     * @return The string
     */
    public String toString()
    {
-      StringBuffer sb = new StringBuffer();
+      final StringBuilder sb = new StringBuilder();
+      final String newline = System.getProperty("line.separator");
 
-      sb = sb.append(getClass().getName());
-      sb = sb.append("(\n");
-
-      sb = sb.append("filename=");
-      sb = sb.append(filename);
-      sb = sb.append("\n");
-
-      sb = sb.append("version=");
-      sb = sb.append(version);
-      sb = sb.append("\n");
-
-      sb = sb.append(")");
+      sb.append(getClass().getName()).append('(').append(newline);
+      sb.append("filename=").append(filename).append(newline);
+      sb.append("version=").append(version).append(newline).append(')');
 
       return sb.toString();
    }

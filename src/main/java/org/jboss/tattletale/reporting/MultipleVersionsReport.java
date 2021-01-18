@@ -21,40 +21,37 @@
  */
 package org.jboss.tattletale.reporting;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.Location;
 import org.jboss.tattletale.core.NestableArchive;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 /**
  * Eliminate JAR files with multiple versions
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  * @author <a href="mailto:torben.jaeger@jit-consulting.de">Torben Jaeger</a>
  */
-public class EliminateJarsReport extends AbstractReport
+public class MultipleVersionsReport extends AbstractReport
 {
    /** NAME */
-   private static final String NAME = "Eliminate Jar files with different versions";
+   private static final String NAME = "Multiple Versions";
 
    /** DIRECTORY */
-   private static final String DIRECTORY = "eliminatejars";
+   private static final String DIRECTORY = "multipleversions";
 
    /** Constructor */
-   public EliminateJarsReport()
+   public MultipleVersionsReport()
    {
       super(DIRECTORY, ReportSeverity.WARNING, NAME, DIRECTORY);
    }
 
    /**
     * write out the report's content
-    *
     * @param bw the writer to use
     * @throws IOException if an error occurs
     */
@@ -63,44 +60,32 @@ public class EliminateJarsReport extends AbstractReport
       bw.write("<table>" + Dump.newLine());
 
       bw.write("  <tr>" + Dump.newLine());
-      bw.write("     <th>Archive</th>" + Dump.newLine());
-      bw.write("     <th>Location</th>" + Dump.newLine());
+      bw.write("    <th>Archive</th>" + Dump.newLine());
+      bw.write("    <th>Location</th>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       boolean odd = true;
 
       for (Archive archive : archives)
       {
-         String archiveName = archive.getName();
-         int finalDot = archiveName.lastIndexOf(".");
-         String extension = archiveName.substring(finalDot + 1);
+         // Bug-for-bug compatibility: print out a list of locations for nested archives
+         // even if it is not the purpose of this report
+         boolean include = (archive instanceof NestableArchive);
 
          SortedSet<Location> locations = getLocations(archive);
-         Iterator<Location> lit = locations.iterator();
-
-         Location location = lit.next();
-
-         boolean include = false;
-         String version = location.getVersion();
+         String version = locations.first().getVersion();
          boolean filtered = isFiltered(archive.getName());
 
-         while (!include && lit.hasNext())
+         for (Location location : locations)
          {
-            location = lit.next();
-
-            //noinspection StringEquality
-            if (version == location.getVersion() || (version != null && version.equals(location.getVersion())))
-            {
-               // Same version identifier - just continue
-            }
-            else
+            if (null != version && !version.equals(location.getVersion()))
             {
                include = true;
-
                if (!filtered)
                {
                   status = ReportStatus.RED;
                }
+               break;
             }
          }
 
@@ -114,17 +99,13 @@ public class EliminateJarsReport extends AbstractReport
             {
                bw.write("  <tr class=\"roweven\">" + Dump.newLine());
             }
-            bw.write("     <td><a href=\"../" + extension + "/" + archiveName +
-                     ".html\">" + archiveName + "</a></td>" + Dump.newLine());
-            bw.write("     <td>");
+            bw.write("    <td>" + hrefToArchiveReport(archive) + "</td>" + Dump.newLine());
+            bw.write("    <td>" + Dump.newLine());
 
-            bw.write("       <table>" + Dump.newLine());
+            bw.write("      <table>" + Dump.newLine());
 
-            lit = locations.iterator();
-            while (lit.hasNext())
+            for (Location location : locations)
             {
-               location = lit.next();
-
                bw.write("      <tr>" + Dump.newLine());
 
                bw.write("        <td>" + location.getFilename() + "</td>" + Dump.newLine());
@@ -136,7 +117,7 @@ public class EliminateJarsReport extends AbstractReport
                {
                   bw.write("        <td style=\"text-decoration: line-through;\">");
                }
-               if (location.getVersion() != null)
+               if (null != location.getVersion())
                {
                   bw.write(location.getVersion());
                }
@@ -149,29 +130,31 @@ public class EliminateJarsReport extends AbstractReport
                bw.write("      </tr>" + Dump.newLine());
             }
 
-            bw.write("       </table>" + Dump.newLine());
+            bw.write("      </table>" + Dump.newLine());
 
-            bw.write("</td>" + Dump.newLine());
+            bw.write("    </td>" + Dump.newLine());
             bw.write("  </tr>" + Dump.newLine());
 
             odd = !odd;
          }
-
       }
 
       bw.write("</table>" + Dump.newLine());
    }
 
-
+   /**
+    * Method getLocations.
+    * @param archive Archive
+    * @return SortedSet<Location>
+    */
    private SortedSet<Location> getLocations(Archive archive)
    {
-      SortedSet<Location> locations = new TreeSet<Location>();
+      final SortedSet<Location> locations = new TreeSet<Location>();
       if (archive instanceof NestableArchive)
       {
-         NestableArchive nestableArchive = (NestableArchive) archive;
-         List<Archive> subArchives = nestableArchive.getSubArchives();
+         final NestableArchive nestableArchive = (NestableArchive) archive;
 
-         for (Archive sa : subArchives)
+         for (Archive sa : nestableArchive.getSubArchives())
          {
             locations.addAll(getLocations(sa));
          }
@@ -184,25 +167,7 @@ public class EliminateJarsReport extends AbstractReport
    }
 
    /**
-    * write out the header of the report's content
-    *
-    * @param bw the writer to use
-    * @throws IOException if an errror occurs
-    */
-   public void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
-   {
-      bw.write("<body>" + Dump.newLine());
-      bw.write(Dump.newLine());
-
-      bw.write("<h1>" + NAME + "</h1>" + Dump.newLine());
-
-      bw.write("<a href=\"../index.html\">Main</a>" + Dump.newLine());
-      bw.write("<p>" + Dump.newLine());
-   }
-
-   /**
     * Create filter
-    *
     * @return The filter
     */
    @Override

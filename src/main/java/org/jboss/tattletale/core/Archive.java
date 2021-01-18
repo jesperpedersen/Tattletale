@@ -22,7 +22,6 @@
 package org.jboss.tattletale.core;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -31,48 +30,48 @@ import java.util.TreeSet;
 /**
  * Archive
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
-public abstract class Archive implements Serializable, Comparable
+public abstract class Archive implements Serializable, Comparable<Archive>
 {
    /** SerialVersionUID */
    static final long serialVersionUID = 8349128019949046037L;
 
    /** Archive type */
-   private int type;
+   private final ArchiveType type;
 
    /** The name */
-   private String name;
+   private final String name;
 
    /** The version */
-   private int version;
+   private final int version;
 
    /** Manifest */
-   private List<String> manifest;
+   private final List<String> manifest;
 
    /** Signing information */
-   private List<String> sign;
+   private final List<String> sign;
 
    /** Requires */
-   private SortedSet<String> requires;
+   private final SortedSet<String> requires;
 
    /** Provides */
-   private SortedMap<String, Long> provides;
+   private final SortedMap<String, Long> provides;
 
    /** Profiles */
-   private SortedSet<String> profiles;
+   private final SortedSet<String> profiles;
 
    /** Class dependencies */
-   private SortedMap<String, SortedSet<String>> classDependencies;
+   private final SortedMap<String, SortedSet<String>> classDependencies;
 
    /** Package dependencies */
-   private SortedMap<String, SortedSet<String>> packageDependencies;
+   private final SortedMap<String, SortedSet<String>> packageDependencies;
 
    /** Blacklisted dependencies */
-   private SortedMap<String, SortedSet<String>> blacklistedDependencies;
+   private final SortedMap<String, SortedSet<String>> blacklistedDependencies;
 
    /** Locations */
-   private SortedSet<Location> locations;
+   private final SortedSet<Location> locations;
 
    /** OSGi archive */
    private transient Boolean osgi;
@@ -85,7 +84,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Constructor
-    *
     * @param type                    The type
     * @param name                    The name
     * @param version                 The version number
@@ -98,12 +96,12 @@ public abstract class Archive implements Serializable, Comparable
     * @param blacklistedDependencies The blacklisted dependencies
     * @param location                The location
     */
-   public Archive(int type, String name, int version, List<String> manifest, List<String> sign,
-                  SortedSet<String> requires, SortedMap<String, Long> provides,
-                  SortedMap<String, SortedSet<String>> classDependencies,
-                  SortedMap<String, SortedSet<String>> packageDependencies,
-                  SortedMap<String, SortedSet<String>> blacklistedDependencies,
-                  Location location)
+   protected Archive(ArchiveType type, String name, int version, List<String> manifest,
+                     List<String> sign, SortedSet<String> requires, SortedMap<String, Long> provides,
+                     SortedMap<String, SortedSet<String>> classDependencies,
+                     SortedMap<String, SortedSet<String>> packageDependencies,
+                     SortedMap<String, SortedSet<String>> blacklistedDependencies,
+                     Location location)
    {
       this.type = type;
       this.name = name;
@@ -112,33 +110,31 @@ public abstract class Archive implements Serializable, Comparable
       this.sign = sign;
       this.requires = requires;
       this.provides = provides;
-      this.profiles = new TreeSet<String>();
       this.classDependencies = classDependencies;
       this.packageDependencies = packageDependencies;
       this.blacklistedDependencies = blacklistedDependencies;
-      this.locations = new TreeSet<Location>();
-      this.osgi = null;
-      this.moduleIdentifier = name;
+      profiles = new TreeSet<String>();
+      locations = new TreeSet<Location>();
+      osgi = null;
+      moduleIdentifier = name;
 
-      if (location != null)
+      if (null != location)
       {
-         this.locations.add(location);
+         locations.add(location);
       }
    }
 
    /**
     * Get the type
-    *
     * @return The value
     */
-   public int getType()
+   public ArchiveType getType()
    {
       return type;
    }
 
    /**
     * Get the name
-    *
     * @return The value
     */
    public String getName()
@@ -148,7 +144,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the version
-    *
     * @return The value
     */
    public int getVersion()
@@ -158,7 +153,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the manifest
-    *
     * @return The value
     */
    public List<String> getManifest()
@@ -168,13 +162,12 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Has manifest key
-    *
     * @param key The manifest key
     * @return True if the key is found; otherwise false
     */
    public boolean hasManifestKey(String key)
    {
-      if (manifest != null)
+      if (null != manifest)
       {
          for (String s : manifest)
          {
@@ -190,37 +183,34 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get manifest value
-    *
     * @param key The manifest key
     * @return The value; <code>null</code> if not found
     */
    public String getManifestValue(String key)
    {
-      if (manifest != null)
+      if (null != manifest)
       {
-         StringBuffer value = new StringBuffer();
+         final StringBuilder value = new StringBuilder();
          boolean found = false;
 
-         Iterator<String> it = manifest.iterator();
-         while (it.hasNext())
+         for (String s : manifest)
          {
-            String s = it.next();
             if (s.startsWith(key))
             {
-               int idx = s.indexOf(":");
-               value = value.append(s.substring(idx + 1).trim());
+               int idx = s.indexOf(':');
+               value.append(s.substring(idx + 1).trim());
                found = true;
             }
             else if (found)
             {
-               int idx = s.indexOf(":");
+               int idx = s.indexOf(':');
                if (idx != -1)
                {
                   return value.toString().trim();
                }
                else
                {
-                  value = value.append(s.trim());
+                  value.append(s.trim());
                }
             }
          }
@@ -231,7 +221,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the signing information
-    *
     * @return The value
     */
    public List<String> getSign()
@@ -241,7 +230,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the requires
-    *
     * @return The value
     */
    public SortedSet<String> getRequires()
@@ -251,7 +239,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the provides
-    *
     * @return The value
     */
    public SortedMap<String, Long> getProvides()
@@ -261,7 +248,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the profiles
-    *
     * @return The value
     */
    public SortedSet<String> getProfiles()
@@ -271,7 +257,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Add a profile
-    *
     * @param profile The profile
     */
    public void addProfile(String profile)
@@ -281,7 +266,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the class dependencies
-    *
     * @return The value
     */
    public SortedMap<String, SortedSet<String>> getClassDependencies()
@@ -291,7 +275,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the package dependencies
-    *
     * @return The value
     */
    public SortedMap<String, SortedSet<String>> getPackageDependencies()
@@ -301,7 +284,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the blacklisted dependencies
-    *
     * @return The value
     */
    public SortedMap<String, SortedSet<String>> getBlackListedDependencies()
@@ -311,7 +293,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Get the locations
-    *
     * @return The value
     */
    public SortedSet<Location> getLocations()
@@ -321,7 +302,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Add a location
-    *
     * @param value The value
     */
    public void addLocation(Location value)
@@ -331,7 +311,6 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Does the archives provide this class
-    *
     * @param clz The class name
     * @return True if the class is provided; otherwise false
     */
@@ -342,41 +321,40 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Is this an OSGi archive ?
-    *
     * @return True if OSGi; otherwise false
     */
    public boolean isOSGi()
    {
-      if (osgi == null)
+      if (null == osgi)
       {
          initOSGi();
       }
 
-      return osgi.booleanValue();
+      return osgi;
    }
 
    /**
     * Simple setter
     * @param moduleIdentifier - the custom module identifier name.
     */
-
    public void setModuleIdentifier(String moduleIdentifier)
    {
       this.moduleIdentifier = moduleIdentifier;
    }
+
    /**
     * Simple getter
+    *
     * @return - the module identifier string. The archive name by default unless the setter was previously called.
     */
-
    public String getModuleIdentifier()
    {
       return moduleIdentifier;
    }
 
-
-
-   /** Init OSGi */
+   /**
+    *  Init OSGi
+    */
    private void initOSGi()
    {
       osgi = hasManifestKey("Bundle-SymbolicName");
@@ -384,38 +362,27 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * Comparable
-    *
-    * @param o The other object
+    * @param a The other archive
     * @return The compareTo value
     */
-   public int compareTo(Object o)
+   public int compareTo(Archive a)
    {
-      Archive a = (Archive) o;
-
       return name.compareTo(a.getName());
    }
 
    /**
     * Equals
-    *
     * @param obj The other object
     * @return True if equals; otherwise false
     */
    public boolean equals(Object obj)
    {
-      if (obj == null || !(obj instanceof Archive))
-      {
-         return false;
-      }
-
-      Archive a = (Archive) obj;
-
-      return name.equals(a.getName());
+      return obj instanceof Archive
+              && name.equals(((Archive) obj).getName());
    }
 
    /**
     * Hash code
-    *
     * @return The hash code
     */
    public int hashCode()
@@ -425,72 +392,32 @@ public abstract class Archive implements Serializable, Comparable
 
    /**
     * String representation
-    *
     * @return The string
     */
    public String toString()
    {
-      StringBuffer sb = new StringBuffer();
+      final StringBuilder sb = new StringBuilder();
+      final String newline = System.getProperty("line.separator");
 
-      sb = sb.append(getClass().getName());
-      sb = sb.append("(\n");
-
-      sb = sb.append("type=");
-      sb = sb.append(type);
-      sb = sb.append("\n");
-
-      sb = sb.append("name=");
-      sb = sb.append(name);
-      sb = sb.append("\n");
-
-      sb = sb.append("version=");
-      sb = sb.append(version);
-      sb = sb.append("\n");
-
-      sb = sb.append("manifest=");
-      sb = sb.append(manifest);
-      sb = sb.append("\n");
-
-      sb = sb.append("sign=");
-      sb = sb.append(sign);
-      sb = sb.append("\n");
-
-      sb = sb.append("requires=");
-      sb = sb.append(requires);
-      sb = sb.append("\n");
-
-      sb = sb.append("provides=");
-      sb = sb.append(provides);
-      sb = sb.append("\n");
-
-      sb = sb.append("profiles=");
-      sb = sb.append(profiles);
-      sb = sb.append("\n");
-
-      sb = sb.append("classdependencies=");
-      sb = sb.append(classDependencies);
-      sb = sb.append("\n");
-
-      sb = sb.append("packagedependencies=");
-      sb = sb.append(packageDependencies);
-      sb = sb.append("\n");
-
-      sb = sb.append("blacklisteddependencies=");
-      sb = sb.append(blacklistedDependencies);
-      sb = sb.append("\n");
-
-      sb = sb.append("locations=");
-      sb = sb.append(locations);
-      sb = sb.append("\n");
-
-      sb = sb.append(")");
+      sb.append(getClass().getName()).append('(').append(newline);
+      sb.append("type=").append(type).append(newline);
+      sb.append("name=").append(name).append(newline);
+      sb.append("version=").append(version).append(newline);
+      sb.append("manifest=").append(manifest).append(newline);
+      sb.append("sign=").append(sign).append(newline);
+      sb.append("requires=").append(requires).append(newline);
+      sb.append("provides=").append(provides).append(newline);
+      sb.append("profiles=").append(profiles).append(newline);
+      sb.append("classdependencies=").append(classDependencies).append(newline);
+      sb.append("packagedependencies=").append(packageDependencies).append(newline);
+      sb.append("blacklisteddependencies=").append(blacklistedDependencies).append(newline);
+      sb.append("locations=").append(locations).append(newline).append(')');
 
       return sb.toString();
    }
 
    /**
     * Simple getter.
-    *
     * @return - the parent archive.
     */
    public Archive getParentArchive()
@@ -499,8 +426,7 @@ public abstract class Archive implements Serializable, Comparable
    }
 
    /**
-    * Simple setter,
-    *
+    * Simple setter.
     * @param parentArchive - the parent archive.
     */
    public void setParentArchive(Archive parentArchive)

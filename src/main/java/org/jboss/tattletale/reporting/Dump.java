@@ -21,8 +21,6 @@
  */
 package org.jboss.tattletale.reporting;
 
-import org.jboss.tattletale.Version;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,26 +30,29 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.SortedSet;
 
+import org.jboss.tattletale.Version;
+
 /**
  * Dump
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
- * @author Jay Balunas <jbalunas@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
+ * @author <a href="mailto:jbalunas@jboss.org">Jay Balunas</a>
  */
 public class Dump
 {
    /** New line character */
    private static final String NEW_LINE = System.getProperty("line.separator");
 
+   /** Field TITLE. (value is "Version.FULL_VERSION") */
+   private static final String TITLE = Version.FULL_VERSION;
+
    /**
     * Generate CSS files
-    *
     * @param outputDir where the reports go
     */
    public static void generateCSS(String outputDir)
    {
-      byte buffer[] = new byte[8192];
-      int bytesRead;
+      final byte[] buffer = new byte[8192];
 
       InputStream is = null;
       OutputStream os = null;
@@ -60,23 +61,23 @@ public class Dump
          is = Dump.class.getClassLoader().getResourceAsStream("style.css");
          os = new FileOutputStream(outputDir + "style.css");
 
-         while ((bytesRead = is.read(buffer)) != -1)
+         for (int bytesRead; (bytesRead = is.read(buffer)) != -1;)
          {
             os.write(buffer, 0, bytesRead);
          }
 
          os.flush();
       }
-      catch (Exception e)
+      catch (IOException ioe)
       {
-         System.err.println("GenerateCSS: " + e.getMessage());
-         e.printStackTrace(System.err);
+         System.err.println("GenerateCSS: " + ioe.getMessage());
+         ioe.printStackTrace(System.err);
       }
       finally
       {
          try
          {
-            if (is != null)
+            if (null != is)
             {
                is.close();
             }
@@ -88,7 +89,7 @@ public class Dump
 
          try
          {
-            if (os != null)
+            if (null != os)
             {
                os.close();
             }
@@ -101,37 +102,60 @@ public class Dump
    }
 
    /**
+    * Method generateIndex.
+    * @param dependenciesReports SortedSet&lt;Report&gt;
+    * @param generalReports SortedSet&lt;Report&gt;
+    * @param archiveReports SortedSet&lt;Report&gt;
+    * @param customReports SortedSet&lt;Report&gt;
+    * @param outputDir String
+    */
+   @Deprecated
+   public static void generateIndex(SortedSet<Report> dependenciesReports,
+           SortedSet<Report> generalReports,
+           SortedSet<Report> archiveReports,
+           SortedSet<Report> customReports,
+           String outputDir)
+   {
+      generateIndex(dependenciesReports, generalReports, archiveReports, customReports, outputDir, null);
+   }
+
+   /**
     * Generate index.html
-    *
     * @param dependenciesReports The dependencies reports
     * @param generalReports      The general reports
     * @param archiveReports      The archive reports
     * @param customReports       The custom reports as defined by the user in jboss-tattletale.properties
     * @param outputDir           where the reports go
+    * @param t String
     */
    public static void generateIndex(SortedSet<Report> dependenciesReports,
                                     SortedSet<Report> generalReports,
                                     SortedSet<Report> archiveReports,
                                     SortedSet<Report> customReports,
-                                    String outputDir)
+                                    String outputDir,
+                                    String t)
    {
+      if (null == t || t.isEmpty())
+      {
+         t = TITLE;
+      }
+
       try
       {
-         FileWriter fw = new FileWriter(outputDir + "index.html");
-         BufferedWriter bw = new BufferedWriter(fw, 8192);
+         final FileWriter fw = new FileWriter(outputDir + "index.html");
+         final BufferedWriter bw = new BufferedWriter(fw, 8192);
 
-         bw.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" +
+         bw.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" " +
                   "\"http://www.w3.org/TR/html4/loose.dtd\">" + newLine());
          bw.write("<html>" + newLine());
          bw.write("<head>" + newLine());
-         bw.write("  <title>" + Version.FULL_VERSION + ": Index</title>" + newLine());
-         bw.write("  <meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">" + newLine());
-         bw.write("  <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">" + newLine());
+         bw.write("  <title>" + t + ": Index</title>" + newLine());
+         bw.write("  <meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"/>" + newLine());
+         bw.write("  <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\"/>" + newLine());
          bw.write("</head>" + newLine());
          bw.write("<body>" + newLine());
          bw.write(newLine());
-
-         bw.write("<h1>" + Version.FULL_VERSION + "</h1>" + newLine());
+         bw.write("<h1>" + t + "</h1>" + newLine());
 
          generateReportItems(bw, dependenciesReports, "Dependencies", false);
          generateReportItems(bw, generalReports, "Reports", false);
@@ -139,9 +163,8 @@ public class Dump
          generateReportItems(bw, customReports, "Custom reports", false);
 
          bw.write(newLine());
-         bw.write("<p>" + newLine());
-         bw.write("<hr>" + newLine());
-         bw.write("Generated by: <a href=\"http://www.jboss.org/tattletale\">" +
+         bw.write("<hr/>" + newLine());
+         bw.write("Generated by: <a href=\"https://tattletale.jboss.org/\">" +
                   Version.FULL_VERSION + "</a>" + newLine());
          bw.write(newLine());
          bw.write("</body>" + newLine());
@@ -150,16 +173,15 @@ public class Dump
          bw.flush();
          bw.close();
       }
-      catch (Exception e)
+      catch (IOException ioe)
       {
-         System.err.println("GenerateIndex: " + e.getMessage());
-         e.printStackTrace(System.err);
+         System.err.println("GenerateIndex: " + ioe.getMessage());
+         ioe.printStackTrace(System.err);
       }
    }
 
    /**
     * Simple static method to return the System property of line separator.
-    *
     * @return - the line separator from System properties.
     */
    public static String newLine()
@@ -167,11 +189,18 @@ public class Dump
       return NEW_LINE;
    }
 
+   /**
+    * Method generateReportItems.
+    * @param bw BufferedWriter
+    * @param reports SortedSet<Report>
+    * @param heading String
+    * @param useReportName boolean
+    * @throws IOException
+    */
    private static void generateReportItems(BufferedWriter bw, SortedSet<Report> reports,
                                            String heading, boolean useReportName) throws IOException
    {
-
-      if (reports != null && reports.size() > 0)
+      if (null != reports && reports.size() > 0)
       {
          bw.write("<h2>" + heading + "</h2>" + newLine());
          bw.write("<ul>" + newLine());
@@ -186,10 +215,10 @@ public class Dump
             }
             bw.write("<a href=\"" + r.getDirectory() + "/" + fileBase + ".html\">" + r.getName() + "</a> (");
             bw.write("<span");
-            bw.write(" style=\"color: " + ReportStatus.getStatusColor(r.getStatus()) + ";\"");
+            bw.write(" style=\"color: " + r.getStatus().toString().toLowerCase() + ";\"");
             bw.write(">");
 
-            bw.write(ReportSeverity.getSeverityString(r.getSeverity()));
+            bw.write(r.getSeverity().toString());
             bw.write("</span>");
             bw.write(") (" + getIndexHtmlSize(r) + ")</li>" + newLine());
          }
@@ -198,9 +227,14 @@ public class Dump
       }
    }
 
+   /**
+    * Method getIndexHtmlSize.
+    * @param r Report
+    * @return String
+    */
    private static String getIndexHtmlSize(Report r)
    {
-      File indexFile = new File(r.getOutputDirectory().getAbsolutePath() + File.separator + r.getIndexName());
+      final File indexFile = new File(r.getOutputDirectory().getAbsolutePath() + File.separator + r.getIndexName());
       return ((indexFile.length() / 1024) + 1) + "KB";
    }
 }

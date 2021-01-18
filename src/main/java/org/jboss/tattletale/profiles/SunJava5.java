@@ -21,26 +21,38 @@
  */
 package org.jboss.tattletale.profiles;
 
-import org.jboss.tattletale.core.ArchiveTypes;
-
 import java.util.Set;
 
 import javassist.bytecode.ClassFile;
 
+import org.jboss.tattletale.core.ArchiveType;
+
 /**
  * Sun: Java 5
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class SunJava5 extends AbstractProfile
 {
-
+   /** Field CLASS_SET. (value is ""sunjdk5.clz.gz"") */
    private static final String CLASS_SET = "sunjdk5.clz.gz";
+
+   /** Field PROFILE_NAME. (value is ""Sun Java 5"") */
    private static final String PROFILE_NAME = "Sun Java 5";
+
+   /** Field PROFILE_CODE. (value is ""java5"") */
    private static final String PROFILE_CODE = "java5";
+
+   /** Field PROFILE_LOCATION. (value is ""rt.jar"") */
    private static final String PROFILE_LOCATION = "rt.jar";
+
+   /** Field MODULE_IDENTIFIER. (value is ""system"") */
    private static final String MODULE_IDENTIFIER = "system";
-   private static final int ARCHIVE_TYPE = ArchiveTypes.JAR;
+
+   /** Field ARCHIVE_TYPE. (value is ArchiveType.JAR) */
+   private static final ArchiveType ARCHIVE_TYPE = ArchiveType.JAR;
+
+   /** Field CLASSFILE_VERSION. (value is ClassFile.JAVA_5) */
    private static final int CLASSFILE_VERSION = ClassFile.JAVA_5;
 
    /** Constructor */
@@ -52,29 +64,47 @@ public class SunJava5 extends AbstractProfile
       addSubProfile(new SunJava5JSSE());
    }
 
+   /**
+    * Method getProfileCode.
+    * @return String
+    */
    @Override
    public String getProfileCode()
    {
       return PROFILE_CODE;
    }
 
+   /**
+    * Method getProfileName.
+    * @return String
+    */
    @Override
    protected String getProfileName()
    {
       return PROFILE_NAME;
    }
 
+   /**
+    * Method included.
+    * @param allProfiles boolean
+    * @param profileSet Set&lt;String&gt;
+    * @return boolean
+    */
    @Override
    public boolean included(boolean allProfiles, Set<String> profileSet)
    {
-      return allProfiles || profileSet == null || profileSet.isEmpty() && (profileSet.contains(getProfileCode())
-            || profileSet.contains(getProfileName()));
+      return allProfiles || null == profileSet || profileSet.isEmpty()
+             || profileSet.contains(getProfileCode()) || profileSet.contains(getProfileName());
    }
 
+   /**
+    * Method getModuleIdentifier.
+    * @return String
+    * @see org.jboss.tattletale.profiles.Profile#getModuleIdentifier()
+    */
    @Override
    public String getModuleIdentifier()
    {
       return MODULE_IDENTIFIER;
    }
 }
-

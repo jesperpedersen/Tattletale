@@ -21,14 +21,10 @@
  */
 package org.jboss.tattletale.reporting;
 
-import org.jboss.tattletale.core.Archive;
-import org.jboss.tattletale.core.ArchiveTypes;
-import org.jboss.tattletale.core.NestableArchive;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,10 +33,14 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.jboss.tattletale.core.Archive;
+import org.jboss.tattletale.core.ArchiveType;
+import org.jboss.tattletale.core.NestableArchive;
+
 /**
  * Transitive Depends On report
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  * @author <a href="mailto:torben.jaeger@jit-consulting.de">Torben Jaeger</a>
  */
 public class TransitiveDependsOnReport extends CLSReport
@@ -59,7 +59,6 @@ public class TransitiveDependsOnReport extends CLSReport
 
    /**
     * write out the report's content
-    *
     * @param bw the writer to use
     * @throws IOException if an error occurs
     */
@@ -68,11 +67,11 @@ public class TransitiveDependsOnReport extends CLSReport
       bw.write("<table>" + Dump.newLine());
 
       bw.write("  <tr>" + Dump.newLine());
-      bw.write("     <th>Archive</th>" + Dump.newLine());
-      bw.write("     <th>Depends On</th>" + Dump.newLine());
+      bw.write("    <th>Archive</th>" + Dump.newLine());
+      bw.write("    <th>Depends On</th>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
-      SortedMap<String, SortedSet<String>> dependsOnMap = new TreeMap<String, SortedSet<String>>();
+      final SortedMap<String, SortedSet<String>> dependsOnMap = new TreeMap<String, SortedSet<String>>();
 
       for (Archive archive : archives)
       {
@@ -80,13 +79,11 @@ public class TransitiveDependsOnReport extends CLSReport
 
          for (Archive a : archives)
          {
-
-            if (a.getType() == ArchiveTypes.JAR)
+            if (a.getType() == ArchiveType.JAR)
             {
                for (String require : getRequires(a))
                {
-
-                  if (archive.doesProvide(require) && (getCLS() == null || getCLS().isVisible(a, archive)))
+                  if (archive.doesProvide(require) && (null == getCLS() || getCLS().isVisible(a, archive)))
                   {
                      result.add(a.getName());
                   }
@@ -97,24 +94,16 @@ public class TransitiveDependsOnReport extends CLSReport
          dependsOnMap.put(archive.getName(), result);
       }
 
-      SortedMap<String, SortedSet<String>> transitiveDependsOnMap = new TreeMap<String, SortedSet<String>>();
+      final SortedMap<String, SortedSet<String>> transitiveDependsOnMap = new TreeMap<String, SortedSet<String>>();
 
-      Iterator mit = dependsOnMap.entrySet().iterator();
-      while (mit.hasNext())
+      for (Map.Entry<String, SortedSet<String>> entry : dependsOnMap.entrySet())
       {
-         Map.Entry entry = (Map.Entry) mit.next();
-
-         String archive = (String) entry.getKey();
-         SortedSet<String> value = (SortedSet<String>) entry.getValue();
-
+         String archive = entry.getKey();
          SortedSet<String> result = new TreeSet<String>();
 
-         if (value != null && value.size() > 0)
+         for (String aValue : entry.getValue())
          {
-            for (String aValue : value)
-            {
-               resolveDependsOn(aValue, archive, dependsOnMap, result);
-            }
+            resolveDependsOn(aValue, archive, dependsOnMap, result);
          }
 
          transitiveDependsOnMap.put(archive, result);
@@ -122,13 +111,10 @@ public class TransitiveDependsOnReport extends CLSReport
 
       boolean odd = true;
 
-      mit = transitiveDependsOnMap.entrySet().iterator();
-      while (mit.hasNext())
+      for (Map.Entry<String, SortedSet<String>> entry : transitiveDependsOnMap.entrySet())
       {
-         Map.Entry entry = (Map.Entry) mit.next();
-
-         String archive = (String) entry.getKey();
-         SortedSet<String> value = (SortedSet<String>) entry.getValue();
+         String archive = entry.getKey();
+         SortedSet<String> value = entry.getValue();
 
          if (odd)
          {
@@ -138,44 +124,40 @@ public class TransitiveDependsOnReport extends CLSReport
          {
             bw.write("  <tr class=\"roweven\">" + Dump.newLine());
          }
-         bw.write("     <td><a href=\"../jar/" + archive + ".html\">" + archive + "</a></td>" + Dump.newLine());
-         bw.write("     <td>");
 
-         if (value.size() == 0)
+         bw.write("    <td>" + hrefToReport(archive) + "</td>" + Dump.newLine());
+
+         bw.write("    <td>");
+         if (0 == value.size())
          {
             bw.write("&nbsp;");
          }
          else
          {
-            Iterator<String> valueIt = value.iterator();
-            while (valueIt.hasNext())
+            List<String> hrefs = new ArrayList<String>();
+            for (String r : value)
             {
-               String r = valueIt.next();
                if (r.endsWith(".jar"))
                {
-                  bw.write("<a href=\"../jar/" + r + ".html\">" + r + "</a>");
+                  hrefs.add(hrefToReport(r));
                }
                else
                {
                   if (!isFiltered(archive, r))
                   {
-                     bw.write("<i>" + r + "</i>");
                      status = ReportStatus.YELLOW;
+                     hrefs.add("<i>" + r + "</i>");
                   }
                   else
                   {
-                     bw.write("<i style=\"text-decoration: line-through;\">" + r + "</i>");
+                     hrefs.add("<i style=\"text-decoration: line-through;\">" + r + "</i>");
                   }
                }
-
-               if (valueIt.hasNext())
-               {
-                  bw.write(", ");
-               }
             }
+            bw.write(join(hrefs, ", "));
          }
-
          bw.write("</td>" + Dump.newLine());
+
          bw.write("  </tr>" + Dump.newLine());
 
          odd = !odd;
@@ -184,16 +166,20 @@ public class TransitiveDependsOnReport extends CLSReport
       bw.write("</table>" + Dump.newLine());
    }
 
+   /**
+    * Method getRequires.
+    * @param a Archive
+    * @return Set<String>
+    */
    private Set<String> getRequires(Archive a)
    {
-      Set<String> requires = new HashSet<String>();
+      final Set<String> requires = new HashSet<String>();
       if (a instanceof NestableArchive)
       {
-         NestableArchive na = (NestableArchive) a;
-         List<Archive> subArchives = na.getSubArchives();
+         final NestableArchive na = (NestableArchive) a;
          requires.addAll(na.getRequires());
 
-         for (Archive sa : subArchives)
+         for (Archive sa : na.getSubArchives())
          {
             requires.addAll(getRequires(sa));
          }
@@ -204,26 +190,9 @@ public class TransitiveDependsOnReport extends CLSReport
       }
       return requires;
    }
-   /**
-    * write out the header of the report's content
-    *
-    * @param bw the writer to use
-    * @throws IOException if an errror occurs
-    */
-   public void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
-   {
-      bw.write("<body>" + Dump.newLine());
-      bw.write(Dump.newLine());
-
-      bw.write("<h1>" + NAME + "</h1>" + Dump.newLine());
-
-      bw.write("<a href=\"../index.html\">Main</a>" + Dump.newLine());
-      bw.write("<p>" + Dump.newLine());
-   }
 
    /**
     * Get depends on
-    *
     * @param scanArchive The scan archive
     * @param archive     The archive
     * @param map         The depends on map
@@ -236,13 +205,9 @@ public class TransitiveDependsOnReport extends CLSReport
       {
          result.add(scanArchive);
 
-         SortedSet<String> value = map.get(scanArchive);
-         if (value != null)
+         for (String aValue : map.get(scanArchive))
          {
-            for (String aValue : value)
-            {
-               resolveDependsOn(aValue, archive, map, result);
-            }
+            resolveDependsOn(aValue, archive, map, result);
          }
       }
    }

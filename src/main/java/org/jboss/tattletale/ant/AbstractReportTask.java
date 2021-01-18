@@ -21,14 +21,13 @@
  */
 package org.jboss.tattletale.ant;
 
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
 /**
- * Base abstract class for TattleTale Report Ant Tasks
+ * Base abstract class for Tattletale Report Ant Tasks
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
- * @author Jay Balunas jbalunas@jboss.org
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
+ * @author <a href="mailto:jbalunas@jboss.org">Jay Balunas</a>
  */
 public abstract class AbstractReportTask extends Task
 {
@@ -45,7 +44,7 @@ public abstract class AbstractReportTask extends Task
    private String filter;
 
    /** Constructor */
-   public AbstractReportTask()
+   protected AbstractReportTask()
    {
       source = ".";
       destination = ".";
@@ -64,7 +63,7 @@ public abstract class AbstractReportTask extends Task
    @Deprecated
    public void setScanDir(String scanDir)
    {
-      this.source = scanDir;
+      source = scanDir;
    }
 
    /** @return the outputDir */
@@ -78,12 +77,11 @@ public abstract class AbstractReportTask extends Task
    @Deprecated
    public void setOutputDir(String outputDir)
    {
-      this.destination = outputDir;
+      destination = outputDir;
    }
 
    /**
     * Get the source
-    *
     * @return The value
     */
    public String getSource()
@@ -93,7 +91,6 @@ public abstract class AbstractReportTask extends Task
 
    /**
     * Set the source
-    *
     * @param source The value
     */
    public void setSource(String source)
@@ -103,7 +100,6 @@ public abstract class AbstractReportTask extends Task
 
    /**
     * Get the destination
-    *
     * @return The value
     */
    public String getDestination()
@@ -113,7 +109,6 @@ public abstract class AbstractReportTask extends Task
 
    /**
     * Set the destination
-    *
     * @param destination The value
     */
    public void setDestination(String destination)
@@ -123,7 +118,6 @@ public abstract class AbstractReportTask extends Task
 
    /**
     * Get the configuration
-    *
     * @return The value
     */
    public String getConfiguration()
@@ -133,7 +127,6 @@ public abstract class AbstractReportTask extends Task
 
    /**
     * Set the configuration
-    *
     * @param configuration The value
     */
    public void setConfiguration(String configuration)
@@ -143,7 +136,6 @@ public abstract class AbstractReportTask extends Task
 
    /**
     * Get the filter
-    *
     * @return The value
     */
    public String getFilter()
@@ -153,19 +145,10 @@ public abstract class AbstractReportTask extends Task
 
    /**
     * Set the filter
-    *
     * @param filter The value
     */
    public void setFilter(String filter)
    {
       this.filter = filter;
    }
-
-   /**
-    * Execute Ant task
-    *
-    * @throws BuildException If an error occurs
-    */
-   public abstract void execute() throws BuildException;
-
 }

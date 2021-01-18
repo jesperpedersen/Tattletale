@@ -21,20 +21,18 @@
  */
 package org.jboss.tattletale.reporting;
 
-import java.util.Iterator;
 import java.util.SortedSet;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 /**
  * Represents a key filter
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class KeyFilter implements Filter
 {
    /** Key Filters */
-   private SortedSet<String> keyFilters;
+   private final SortedSet<String> keyFilters;
 
    /** Constructor */
    public KeyFilter()
@@ -44,8 +42,8 @@ public class KeyFilter implements Filter
 
    /**
     * Is filtered
-    *
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered()
     */
    public boolean isFiltered()
    {
@@ -54,9 +52,9 @@ public class KeyFilter implements Filter
 
    /**
     * Is filtered
-    *
     * @param archive The archive
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered(String)
     */
    public boolean isFiltered(String archive)
    {
@@ -77,11 +75,8 @@ public class KeyFilter implements Filter
 
       archive = archive.replace('.', '/');
 
-      Iterator<String> it = keyFilters.iterator();
-      while (it.hasNext())
+      for (String v : keyFilters)
       {
-         String v = it.next();
-
          if (archive.startsWith(v))
          {
             return true;
@@ -93,10 +88,10 @@ public class KeyFilter implements Filter
 
    /**
     * Is filtered
-    *
     * @param archive The archive
     * @param query   The query
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered(String, String)
     */
    public boolean isFiltered(String archive, String query)
    {
@@ -105,18 +100,15 @@ public class KeyFilter implements Filter
 
    /**
     * Init the filter
-    *
     * @param filter The filter value
+    * @see org.jboss.tattletale.reporting.Filter#init(String)
     */
    public void init(String filter)
    {
-      if (filter != null)
+      if (null != filter)
       {
-         StringTokenizer vt = new StringTokenizer(filter, ",");
-         while (vt.hasMoreTokens())
+         for (String value : filter.split(","))
          {
-            String value = vt.nextToken();
-
             boolean includeAll = false;
 
             if (value.endsWith(".class"))
@@ -139,7 +131,7 @@ public class KeyFilter implements Filter
 
             if (includeAll)
             {
-               value = value + '/';
+               value += '/';
             }
 
             keyFilters.add(value);

@@ -29,44 +29,121 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
- * Class that would be used in order to obtain .jar files stored within a zipped up .war file.
+ * Class that would be used in order to extract .jar files from a .war file.
+ * .war file can be renamed if necessary (so that .jar files have proper path names).
  *
  * @author Navin Surtani
  */
 public class Extractor
 {
-   /** 
-    * Extract a JAR type file
-    *
-    * @param jarFile The war/ear file
-    * @return The root of the extracted JAR file
-    * @exception IOException Thrown if an error occurs
+   /** Field jf */
+   private JarFile jf;
+   /** Field target. */
+   private File target;
+   /** Field tempTarget. */
+   private File tempTarget;
+   /** Field extractPattern */
+   private Pattern extractPattern = Pattern.compile(".*");
+   /** Field basedir */
+   private final String basedir = new File(System.getProperty("java.io.tmpdir")).getCanonicalPath();
+
+   /**
+    * Constructor for Extractor.
+    * @param jar File
+    * @param pattern String - extract only entries matched by pattern
+    * @throws IOException if an error occurs in JarFile
     */
-   public static File extract(JarFile jarFile) throws IOException
+   public Extractor(File jar, String pattern) throws IOException
    {
-      String basedir = new File(System.getProperty("java.io.tmpdir")).getCanonicalPath();
-      String fileName = new File(jarFile.getName()).getCanonicalPath();
-      File target;
+      this(jar);
+
+      try
+      {
+         extractPattern = Pattern.compile(pattern);
+      }
+      catch (PatternSyntaxException pse)
+      {
+         System.err.println("Incorrect extraction pattern: " + pattern);
+      }
+   }
+
+   /**
+    * Constructor for Extractor.
+    * @param jar File
+    * @throws IOException if an error occurs in JarFile
+    */
+   public Extractor(File jar) throws IOException
+   {
+      jf = new JarFile(jar);
+      target = jar;
+
+      if (!jar.isFile())
+      {
+         return;
+      }
+
+      String fileName = jar.getCanonicalPath();
 
       if (fileName.startsWith(basedir))
       {
-         target = new File(fileName);
-      }
-      else
-      {
-         if (fileName.indexOf(":") != -1 &&
-             System.getProperty("os.name").toLowerCase(Locale.US).indexOf("windows") != -1)
+         jf.close();
+         final StringBuilder nb = new StringBuilder(fileName);
+         nb.insert(fileName.lastIndexOf('.'), "." + UUID.randomUUID().toString());
+         tempTarget = new File(nb.toString());
+         if (!target.renameTo(tempTarget))
          {
-            fileName = fileName.substring(fileName.indexOf(":") + 1);
+            System.out.println("Rename of " + fileName + "failed!");
          }
+         jf = new JarFile(tempTarget);
+         return;
+      }
 
-         target = new File(basedir, fileName);
+      if (fileName.indexOf(':') != -1 &&
+          System.getProperty("os.name").toLowerCase(Locale.US).contains("windows"))
+      {
+         fileName = fileName.substring(fileName.indexOf(':') + 1);
+      }
+
+      target = new File(basedir, fileName);
+   }
+
+   /**
+    * Method getTarget.
+    * @return File
+    */
+   public File getTarget()
+   {
+      return target;
+   }
+
+   /**
+    * Method getArchive.
+    * @return JarFile
+    */
+   public JarFile getArchive()
+   {
+      return jf;
+   }
+
+   /**
+    * Extract a nested JAR type file
+    * @throws IOException Thrown if an error occurs
+    */
+   public void extract() throws IOException
+   {
+      if (target.isDirectory() && !target.getCanonicalPath().startsWith(basedir))
+      {
+         return;
       }
 
       if (target.exists())
@@ -79,10 +156,13 @@ public class Extractor
          throw new IOException("Could not create " + target);
       }
 
-      Enumeration<JarEntry> entries = jarFile.entries();
-      while (entries.hasMoreElements())
+      for (JarEntry je : Collections.list(jf.entries()))
       {
-         JarEntry je = entries.nextElement();
+         Matcher matcher = extractPattern.matcher(je.getName());
+         if (!je.isDirectory() && !matcher.matches())
+         {
+            continue;
+         }
          File copy = new File(target, je.getName());
 
          if (!je.isDirectory())
@@ -91,15 +171,17 @@ public class Extractor
             OutputStream out = null;
 
             // Make sure that the directory is _really_ there
-            if (copy.getParentFile() != null && !copy.getParentFile().exists())
+            if (null != copy.getParentFile() && !copy.getParentFile().exists())
             {
                if (!copy.getParentFile().mkdirs())
+               {
                   throw new IOException("Could not create " + copy.getParentFile());
+               }
             }
 
             try
             {
-               in = new BufferedInputStream(jarFile.getInputStream(je));
+               in = new BufferedInputStream(jf.getInputStream(je));
                out = new BufferedOutputStream(new FileOutputStream(copy));
 
                byte[] buffer = new byte[4096];
@@ -107,8 +189,9 @@ public class Extractor
                {
                   int nBytes = in.read(buffer);
                   if (nBytes <= 0)
+                  {
                      break;
-
+                  }
                   out.write(buffer, 0, nBytes);
                }
                out.flush();
@@ -117,20 +200,24 @@ public class Extractor
             {
                try
                {
-                  if (out != null)
+                  if (null != out)
+                  {
                      out.close();
+                  }
                }
-               catch (IOException ignore)
+               catch (IOException ioe)
                {
                   // Ignore
                }
 
                try
                {
-                  if (in != null)
+                  if (null != in)
+                  {
                      in.close();
+                  }
                }
-               catch (IOException ignore)
+               catch (IOException ioe)
                {
                   // Ignore
                }
@@ -141,41 +228,53 @@ public class Extractor
             if (!copy.exists())
             {
                if (!copy.mkdirs())
+               {
                   throw new IOException("Could not create " + copy);
+               }
             }
             else
             {
                if (!copy.isDirectory())
-                  throw new IOException(copy + " isn't a directory");
+               {
+                  throw new IOException(copy + " is not a directory");
+               }
             }
          }
       }
-      return target;
    }
 
+   /**
+    * Method deleteTempTarget.
+    * @throws IOException if an error occurs
+    */
+   public void deleteTempTarget() throws IOException
+   {
+      if (null != tempTarget && !tempTarget.delete())
+      {
+         System.out.println("Delete of " + tempTarget.getCanonicalPath() + "failed!");
+      }
+   }
+
+   /**
+    * Method recursiveDelete.
+    * @param file File
+    * @throws IOException
+    */
    private static void recursiveDelete(File file) throws IOException
    {
-      if (file != null && file.exists())
+      if (null != file && file.exists())
       {
-         File[] files = file.listFiles();
-         if (files != null)
+         if (file.isDirectory())
          {
-            for (int i = 0; i < files.length; i++)
+            for (File f : file.listFiles())
             {
-               if (files[i].isDirectory())
-               {
-                  recursiveDelete(files[i]);
-               }
-               else if (!files[i].delete())
-               {
-                  throw new IOException("Could not delete the file of: " + files[i]);
-               }
+               recursiveDelete(f);
             }
          }
 
          if (!file.delete())
          {
-            throw new IOException("Could not delete the file of: " + file);
+            throw new IOException("Could not delete the file \"" + file + "\"");
          }
       }
    }

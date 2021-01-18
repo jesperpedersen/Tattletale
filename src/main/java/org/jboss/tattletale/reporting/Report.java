@@ -29,69 +29,105 @@ import java.io.File;
  *
  * @author Navin Surtani
  */
-public interface Report extends Comparable
+public interface Report extends Comparable<Report>
 {
+   /**
+    * Represents a report severity
+    */
+   enum ReportSeverity
+   {
+      /**
+       * INFO
+       */
+      INFO,
+      /**
+       * WARN
+       */
+      WARNING,
+      /**
+       * FAIL
+       */
+      ERROR
+   }
+
+   /**
+    * Represents a report status
+    */
+   enum ReportStatus
+   {
+       /**
+        * GREEN
+        */
+      GREEN,
+      /**
+       * YELLOW
+       */
+      YELLOW,
+      /**
+       * READ
+       */
+      RED
+   }
+
    /**
     * Method that any implementation must provide in order to generate any type of report.
     * @param outputDirectory - the top-level output directory that the generated report would end up.
     */
-   public void generate(String outputDirectory);
+   void generate(String outputDirectory);
 
    /**
     * Method to obtain the id of each Report.
     * @return - the report id.
     */
-   public String getId();
+   String getId();
 
    /**
     * Method to obtain the severity of each Report.
-    * @return - the severity of the Report as an integer.
+    * @return - the severity of the Report.
     */
-   public int getSeverity();
+   ReportSeverity getSeverity();
 
    /**
     * Method to obtain the status of each Report.
     * @return - the status of the Report.
     */
-   public int getStatus();
+   ReportStatus getStatus();
 
    /**
     * Method to obtain the directory within the filesystem that the Report is intended to go into.
     * @return - the directory on the filesystem where the Report would be.
     */
-   public String getDirectory();
+   String getDirectory();
 
    /**
     * Returns the name of the Report.
     * @return - the name of the report.
     */
-   public String getName();
+   String getName();
 
    /**
     * Method to get hold of the filter that are being applied.
     * @return - the filter that is being used.
     */
-   public String getFilter();
+   String getFilter();
 
    /**
     * Method that is required in order to generate the Report in {@link org.jboss.tattletale.reporting.Dump}
     * @return - the output directory as a File.
     */
-   public File getOutputDirectory();
+   File getOutputDirectory();
 
    /**
     * Method that would be used to return the name of the index file where the report would sit. For example,
     * index.html, report.html, mycustomreport.html etc etc.
-    *
-    * @return - the String (including file suffix) of what the index file would be which would contain the Report and
+    * @return String (including file suffix) of what the index file would be which would contain the Report and
     * its data.
     */
-   public String getIndexName();
+   String getIndexName();
+
    /**
     * Assigns the filter to be used by a String.
     * @param filter - the String to be used to set the filter.
     */
-   public void setFilter(String filter);
-
-
+   void setFilter(String filter);
 }

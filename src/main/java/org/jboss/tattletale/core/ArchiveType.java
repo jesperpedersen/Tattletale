@@ -19,54 +19,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.tattletale.reporting;
+package org.jboss.tattletale.core;
 
 /**
- * Represents a report status
+ * Archive types
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
-public class ReportStatus
+public enum ArchiveType
 {
-   /** GREEN */
-   public static final int GREEN = 0;
-
-   /** YELLOW */
-   public static final int YELLOW = 1;
-
-   /** RED */
-   public static final int RED = 2;
+   /**
+    * Placeholder for WEB-INF/classes
+    */
+   CLASS,
+   /**
+    * JAR
+    */
+   JAR,
+   /**
+    * WAR or RAR (similar structure for our purposes: contains subarchives)
+    */
+   WAR,
+   /**
+    * EAR (contains subarchives that may contain subarchives; see WAR)
+    */
+   EAR;
 
    /**
-    * Constructor
-    *
-    * @param actions The actions
+    * @return lowercase string corresponding to file extension
     */
-   private ReportStatus()
+   @Override
+   public String toString()
    {
-   }
-
-   /**
-    * Returns status display color
-    *
-    * @param status status constant value
-    * @return status display color
-    */
-   public static String getStatusColor(int status)
-   {
-      String output = "-";
-      if (status == ReportStatus.GREEN)
-      {
-         output = "green";
-      }
-      else if (status == ReportStatus.YELLOW)
-      {
-         output = "orange";
-      }
-      else if (status == ReportStatus.RED)
-      {
-         output = "red";
-      }
-      return output;
+      return super.toString().toLowerCase();
    }
 }

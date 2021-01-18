@@ -24,7 +24,7 @@ package org.jboss.tattletale.reporting;
 /**
  * Represents a boolean filter
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class BooleanFilter implements Filter
 {
@@ -34,24 +34,24 @@ public class BooleanFilter implements Filter
    /** Constructor */
    public BooleanFilter()
    {
-      this.booleanFilter = Boolean.FALSE;
+      booleanFilter = Boolean.FALSE;
    }
 
    /**
     * Is filtered
-    *
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered()
     */
    public boolean isFiltered()
    {
-      return booleanFilter.booleanValue();
+      return booleanFilter;
    }
 
    /**
     * Is filtered
-    *
     * @param archive The archive
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered(String)
     */
    public boolean isFiltered(String archive)
    {
@@ -60,10 +60,10 @@ public class BooleanFilter implements Filter
 
    /**
     * Is filtered
-    *
     * @param archive The archive
     * @param query   The query
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered(String, String)
     */
    public boolean isFiltered(String archive, String query)
    {
@@ -72,12 +72,12 @@ public class BooleanFilter implements Filter
 
    /**
     * Init the filter
-    *
     * @param filter The filter value
+    * @see org.jboss.tattletale.reporting.Filter#init(String)
     */
    public void init(String filter)
    {
-      if (filter != null)
+      if (null != filter)
       {
          if ("yes".equalsIgnoreCase(filter) || "on".equalsIgnoreCase(filter) || "true".equalsIgnoreCase(filter))
          {

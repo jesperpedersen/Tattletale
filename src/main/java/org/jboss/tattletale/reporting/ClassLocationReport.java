@@ -23,7 +23,8 @@ package org.jboss.tattletale.reporting;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -31,7 +32,7 @@ import java.util.SortedSet;
 /**
  * Class location report
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  * @author <a href="mailto:torben.jaeger@jit-consulting.de">Torben Jaeger</a>
  */
 public class ClassLocationReport extends AbstractReport
@@ -53,7 +54,6 @@ public class ClassLocationReport extends AbstractReport
 
    /**
     * Set the globally provides map to be used in generating this report
-    *
     * @param gProvides the map of global provides
     */
    public void setGlobalProvides(SortedMap<String, SortedSet<String>> gProvides)
@@ -63,7 +63,6 @@ public class ClassLocationReport extends AbstractReport
 
    /**
     * write the report's content
-    *
     * @param bw the BufferedWriter to use
     * @throws IOException if an error occurs
     */
@@ -73,25 +72,16 @@ public class ClassLocationReport extends AbstractReport
       bw.write("<table>" + Dump.newLine());
 
       bw.write("  <tr>" + Dump.newLine());
-      bw.write("     <th>Class</th>" + Dump.newLine());
-      bw.write("     <th>Jar files</th>" + Dump.newLine());
+      bw.write("    <th>Class</th>" + Dump.newLine());
+      bw.write("    <th>Archives</th>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       boolean odd = true;
 
       for (Map.Entry<String, SortedSet<String>> entry : gProvides.entrySet())
       {
-         String clz = (String) ((Map.Entry) entry).getKey();
-         SortedSet archives = (SortedSet) ((Map.Entry) entry).getValue();
-         boolean filtered = isFiltered(clz);
-
-         if (!filtered)
-         {
-            if (archives.size() > 1)
-            {
-               status = ReportStatus.YELLOW;
-            }
-         }
+         String clz = entry.getKey();
+         SortedSet<String> archives = entry.getValue();
 
          if (odd)
          {
@@ -101,32 +91,33 @@ public class ClassLocationReport extends AbstractReport
          {
             bw.write("  <tr class=\"roweven\">" + Dump.newLine());
          }
-         bw.write("     <td>" + clz + "</td>" + Dump.newLine());
-         if (!filtered)
+
+         bw.write("    <td>" + clz + "</td>" + Dump.newLine());
+
+         if (0 == archives.size())
          {
-            bw.write("        <td>");
+            bw.write("<td>&nbsp;");
          }
          else
          {
-            bw.write("        <td style=\"text-decoration: line-through;\">");
-         }
-
-         Iterator sit = archives.iterator();
-         while (sit.hasNext())
-         {
-            String archive = (String) sit.next();
-            int finalDot = archive.lastIndexOf(".");
-            String extension = archive.substring(finalDot + 1);
-
-            bw.write("<a href=\"../" + extension + "/" + archive + ".html\">" + archive + "</a>" + Dump.newLine());
-
-            if (sit.hasNext())
+            if (!isFiltered(clz))
             {
-               bw.write(", ");
+               status = ReportStatus.YELLOW;
+               bw.write("    <td>");
             }
+            else
+            {
+               bw.write("    <td style=\"text-decoration: line-through;\">");
+            }
+            List<String> hrefs = new ArrayList<String>();
+            for (String archive : archives)
+            {
+               hrefs.add(hrefToReport(archive));
+            }
+            bw.write(join(hrefs, ", "));
          }
-
          bw.write("</td>" + Dump.newLine());
+
          bw.write("  </tr>" + Dump.newLine());
 
          odd = !odd;
@@ -135,21 +126,8 @@ public class ClassLocationReport extends AbstractReport
       bw.write("</table>" + Dump.newLine());
    }
 
-   @Override
-   public void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
-   {
-      bw.write("<body>" + Dump.newLine());
-      bw.write(Dump.newLine());
-
-      bw.write("<h1>" + NAME + "</h1>" + Dump.newLine());
-
-      bw.write("<a href=\"../index.html\">Main</a>" + Dump.newLine());
-      bw.write("<p>" + Dump.newLine());
-   }
-
    /**
     * Create filter
-    *
     * @return The filter
     */
    @Override

@@ -1,18 +1,17 @@
 <project name="developerguide" default="all" basedir=".">
 
-
   <property name="docant.dir" value="${basedir}/../../tools/docant"/>
-  <property name="target.dir" value="${basedir}/../../dist" />
-  <property name="docant.target.dir" value="${basedir}/../../build" />
+  <property name="target.dir" value="${basedir}/../../dist"/>
+  <property name="docant.target.dir" value="${basedir}/../../build"/>
 
   <import file="${docant.dir}/support.xml"/>
 
-  <property name="srcDir" value="." />
-  <property name="srcDocName" value="developerguide" />
-  <property name="srcDocNameFile" value="master.xml" />
-  <property name="pdfName" value="JBossTattletale-DevelopersGuide.pdf" />
+  <property name="srcDir" value="."/>
+  <property name="srcDocName" value="developerguide"/>
+  <property name="srcDocNameFile" value="master.xml"/>
+  <property name="pdfName" value="JBossTattletale-DevelopersGuide.pdf"/>
 
-  <target name="docant-init" >
+  <target name="docant-init">
     <available file="${docant.target.dir}/docbook/staging" type="dir" property="docant.support" value="true"/>
   </target>
 
@@ -25,7 +24,7 @@
 
   <target name="docant-prepare" depends="docant-init, docant-support">
     <copy todir="${docant.target.dir}/docbook/staging/images/images">
-        <fileset dir="${basedir}/${srcDir}/en-US/images/"/>
+      <fileset dir="${basedir}/${srcDir}/en-US/images/"/>
     </copy>
   </target>
 
@@ -43,8 +42,8 @@
             sourceDocumentName="${srcDocNameFile}"
             baseOutputDirectory="${docant.target.dir}">
       <format name="html" 
-	      stylesheetResource="classpath:/jbossorg-style/xhtml.xsl"
-	      targetFinalName="index.html"/>
+              stylesheetResource="classpath:/jbossorg-style/xhtml.xsl"
+              targetFinalName="index.html"/>
     </docant>
     <antcall target="docant-post"/>
   </target>
@@ -55,8 +54,8 @@
             sourceDocumentName="${srcDocNameFile}"
             baseOutputDirectory="${docant.target.dir}">
       <format name="html_single" 
-	      stylesheetResource="classpath:/jbossorg-style/xhtml-single.xsl"
-	      targetFinalName="index.html"/>
+              stylesheetResource="classpath:/jbossorg-style/xhtml-single.xsl"
+              targetFinalName="index.html"/>
     </docant>
     <antcall target="docant-post"/>
   </target>
@@ -67,8 +66,8 @@
             sourceDocumentName="${srcDocNameFile}"
             baseOutputDirectory="${docant.target.dir}">
       <format name="pdf" 
-	      stylesheetResource="classpath:/jbossorg-style/pdf.xsl"
-	      targetFinalName="${pdfName}"/>
+              stylesheetResource="classpath:/jbossorg-style/pdf.xsl"
+              targetFinalName="${pdfName}"/>
     </docant>
     <antcall target="docant-post"/>
   </target>
@@ -79,14 +78,14 @@
             sourceDocumentName="${srcDocNameFile}"
             baseOutputDirectory="${docant.target.dir}">
       <format name="html" 
-	      stylesheetResource="classpath:/jbossorg-style/xhtml.xsl"
-	      targetFinalName="index.html"/>
+              stylesheetResource="classpath:/jbossorg-style/xhtml.xsl"
+              targetFinalName="index.html"/>
       <format name="html_single" 
-	      stylesheetResource="classpath:/jbossorg-style/xhtml-single.xsl"
-	      targetFinalName="index.html"/>
+              stylesheetResource="classpath:/jbossorg-style/xhtml-single.xsl"
+              targetFinalName="index.html"/>
       <format name="pdf" 
-	      stylesheetResource="classpath:/jbossorg-style/pdf.xsl"
-	      targetFinalName="${pdfName}"/>
+              stylesheetResource="classpath:/jbossorg-style/pdf.xsl"
+              targetFinalName="${pdfName}"/>
     </docant>
     <antcall target="docant-post"/>
   </target>

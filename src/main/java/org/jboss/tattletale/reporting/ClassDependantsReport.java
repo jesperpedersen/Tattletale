@@ -22,24 +22,22 @@
 
 package org.jboss.tattletale.reporting;
 
-import org.jboss.tattletale.core.Archive;
-import org.jboss.tattletale.core.NestableArchive;
-import org.jboss.tattletale.profiles.Profile;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.jboss.tattletale.core.Archive;
+import org.jboss.tattletale.core.NestableArchive;
+import org.jboss.tattletale.profiles.Profile;
+
 /**
  * Class level Dependants report
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class ClassDependantsReport extends CLSReport
 {
@@ -49,17 +47,14 @@ public class ClassDependantsReport extends CLSReport
    /** DIRECTORY */
    private static final String DIRECTORY = "classdependants";
 
-
    /** Constructor */
    public ClassDependantsReport()
    {
       super(DIRECTORY, ReportSeverity.INFO, NAME, DIRECTORY);
    }
 
-
    /**
     * write out the report's content
-    *
     * @param bw the writer to use
     * @throws IOException if an error occurs
     */
@@ -68,11 +63,11 @@ public class ClassDependantsReport extends CLSReport
       bw.write("<table>" + Dump.newLine());
 
       bw.write("  <tr>" + Dump.newLine());
-      bw.write("     <th>Class</th>" + Dump.newLine());
-      bw.write("     <th>Dependants</th>" + Dump.newLine());
+      bw.write("    <th>Class</th>" + Dump.newLine());
+      bw.write("    <th>Dependants</th>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
-      SortedMap<String, SortedSet<String>> result = new TreeMap<String, SortedSet<String>>();
+      final SortedMap<String, SortedSet<String>> result = new TreeMap<String, SortedSet<String>>();
 
       boolean odd = true;
 
@@ -80,30 +75,22 @@ public class ClassDependantsReport extends CLSReport
       {
          SortedMap<String, SortedSet<String>> classDependencies = getClassDependencies(archive);
 
-         Iterator<Map.Entry<String, SortedSet<String>>> dit = classDependencies.entrySet().iterator();
-         while (dit.hasNext())
+         for (Map.Entry<String, SortedSet<String>> entry : classDependencies.entrySet())
          {
-            Map.Entry<String, SortedSet<String>> entry = dit.next();
             String clz = entry.getKey();
-            SortedSet<String> clzDeps = entry.getValue();
 
-            Iterator<String> sit = clzDeps.iterator();
-            while (sit.hasNext())
+            for (String dep : entry.getValue())
             {
-               String dep = sit.next();
-
                if (!dep.equals(clz))
                {
                   boolean include = true;
 
-                  Iterator<Profile> kit = getKnown().iterator();
-                  while (include && kit.hasNext())
+                  for (Profile profile : getKnown())
                   {
-                     Profile profile = kit.next();
-
                      if (profile.doesProvide(dep))
                      {
                         include = false;
+                        break;
                      }
                   }
 
@@ -111,7 +98,7 @@ public class ClassDependantsReport extends CLSReport
                   {
                      SortedSet<String> deps = result.get(dep);
 
-                     if (deps == null)
+                     if (null == deps)
                      {
                         deps = new TreeSet<String>();
                      }
@@ -125,15 +112,12 @@ public class ClassDependantsReport extends CLSReport
          }
       }
 
-      Iterator<Map.Entry<String, SortedSet<String>>> rit = result.entrySet().iterator();
-
-      while (rit.hasNext())
+      for (Map.Entry<String, SortedSet<String>> entry : result.entrySet())
       {
-         Map.Entry<String, SortedSet<String>> entry = rit.next();
          String clz = entry.getKey();
          SortedSet<String> deps = entry.getValue();
 
-         if (deps != null && deps.size() > 0)
+         if (null != deps && deps.size() > 0)
          {
             if (odd)
             {
@@ -143,22 +127,13 @@ public class ClassDependantsReport extends CLSReport
             {
                bw.write("  <tr class=\"roweven\">" + Dump.newLine());
             }
-            bw.write("     <td>" + clz + "</a></td>" + Dump.newLine());
-            bw.write("     <td>");
 
-            Iterator<String> sit = deps.iterator();
-            while (sit.hasNext())
-            {
-               String dep = sit.next();
-               bw.write(dep);
+            bw.write("    <td>" + clz + "</td>" + Dump.newLine());
 
-               if (sit.hasNext())
-               {
-                  bw.write(", ");
-               }
-            }
-
+            bw.write("    <td>");
+            bw.write(join(deps, ", "));
             bw.write("</td>" + Dump.newLine());
+
             bw.write("  </tr>" + Dump.newLine());
 
             odd = !odd;
@@ -168,16 +143,20 @@ public class ClassDependantsReport extends CLSReport
       bw.write("</table>" + Dump.newLine());
    }
 
+   /**
+    * Method getClassDependencies.
+    * @param archive Archive
+    * @return SortedMap&lt;String,SortedSet&lt;String&gt;&gt;
+    */
    private SortedMap<String, SortedSet<String>> getClassDependencies(Archive archive)
    {
-      SortedMap<String, SortedSet<String>> classDeps = new TreeMap<String, SortedSet<String>>();
+      final SortedMap<String, SortedSet<String>> classDeps = new TreeMap<String, SortedSet<String>>();
 
       if (archive instanceof NestableArchive)
       {
-         NestableArchive nestableArchive = (NestableArchive) archive;
-         List<Archive> subArchives = nestableArchive.getSubArchives();
+         final NestableArchive nestableArchive = (NestableArchive) archive;
 
-         for (Archive sa : subArchives)
+         for (Archive sa : nestableArchive.getSubArchives())
          {
             classDeps.putAll(getClassDependencies(sa));
          }
@@ -189,22 +168,5 @@ public class ClassDependantsReport extends CLSReport
          classDeps.putAll(archive.getClassDependencies());
       }
       return classDeps;
-   }
-
-   /**
-    * write out the header of the report's content
-    *
-    * @param bw the writer to use
-    * @throws IOException if an errror occurs
-    */
-   public void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
-   {
-      bw.write("<body>" + Dump.newLine());
-      bw.write(Dump.newLine());
-
-      bw.write("<h1>" + NAME + "</h1>" + Dump.newLine());
-
-      bw.write("<a href=\"../index.html\">Main</a>" + Dump.newLine());
-      bw.write("<p>" + Dump.newLine());
    }
 }

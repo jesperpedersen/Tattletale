@@ -31,12 +31,12 @@ import java.util.SortedSet;
  *
  * @author Navin Surtani
  */
+@SuppressWarnings("serial")
 public class WarArchive extends NestableArchive
 {
 
    /**
     * Constructor
-    *
     * @param name                    The name
     * @param version                 The version number
     * @param manifest                The manifest
@@ -47,7 +47,7 @@ public class WarArchive extends NestableArchive
     * @param packageDependencies     The package dependencies
     * @param blacklistedDependencies The blacklisted dependencies
     * @param location                The location
-    * @param subArchives             The list of subsidiary archives as prescribed by {@link NestableArchive]}
+    * @param subArchives             The list of subsidiary archives as prescribed by {@link NestableArchive}
     */
    public WarArchive(String name, int version, List<String> manifest, List<String> sign,
                      SortedSet<String> requires, SortedMap<String, Long> provides, SortedMap<String,
@@ -55,9 +55,7 @@ public class WarArchive extends NestableArchive
                      SortedMap<String, SortedSet<String>> blacklistedDependencies, Location location,
                      List<Archive> subArchives)
    {
-      super(ArchiveTypes.WAR, name, version, manifest, sign, requires, provides, classDependencies,
+      super(ArchiveType.WAR, name, version, manifest, sign, requires, provides, classDependencies,
             packageDependencies, blacklistedDependencies, location, subArchives);
    }
-
-
 }

@@ -22,12 +22,10 @@
 
 package org.jboss.tattletale.reporting;
 
-import org.jboss.tattletale.core.NestableArchive;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-
+import org.jboss.tattletale.core.NestableArchive;
 
 /**
  * This type of report is to .ear files as to {@link JarReport} is to .jar files.
@@ -35,9 +33,6 @@ import java.io.IOException;
  */
 public class EarReport extends NestableReport
 {
-   /** DIRECTORY */
-   private static final String DIRECTORY = "ear";
-
    /** File name */
    private String fileName;
 
@@ -47,35 +42,36 @@ public class EarReport extends NestableReport
     */
    public EarReport(NestableArchive archive)
    {
-      super(DIRECTORY, ReportSeverity.INFO, archive);
-      StringBuffer sb = new StringBuffer(archive.getName());
-      setFilename(sb.append(".html").toString());
+      super(archive.getType().toString(), ReportSeverity.INFO, archive);
+      setFilename(archive.getName() + ".html");
    }
 
    /**
-    * Get the name of the directory
-    * @return - the directory
+    * Method getBufferedWriter.
+    * @return BufferedWriter
+    * @throws IOException if an error occurs
     */
    @Override
-   public String getDirectory()
-   {
-      return DIRECTORY;
-   }
-
-   @Override
-   BufferedWriter getBufferedWriter() throws IOException
+   protected BufferedWriter getBufferedWriter() throws IOException
    {
       return getBufferedWriter(getFilename());
    }
 
+   /**
+    * Method getFilename.
+    * @return String
+    */
    private String getFilename()
    {
       return fileName;
    }
 
+   /**
+    * Method setFilename.
+    * @param fileName String
+    */
    private void setFilename(String fileName)
    {
       this.fileName = fileName;
    }
-
 }

@@ -21,23 +21,33 @@
  */
 package org.jboss.tattletale.profiles;
 
-import org.jboss.tattletale.core.ArchiveTypes;
-
 import javassist.bytecode.ClassFile;
+
+import org.jboss.tattletale.core.ArchiveType;
 
 /**
  * Spring 2.5
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class Spring25 extends AbstractProfile
 {
-
+   /** Field CLASS_SET. (value is ""spring25.clz.gz"" */
    private static final String CLASS_SET = "spring25.clz.gz";
+
+   /** Field PROFILE_NAME. (value is ""Spring 2.5"") */
    private static final String PROFILE_NAME = "Spring 2.5";
+
+   /** Field PROFILE_CODE. (value is ""spring25"") */
    private static final String PROFILE_CODE = "spring25";
+
+   /** Field PROFILE_LOCATION. (value is ""spring.jar"") */
    private static final String PROFILE_LOCATION = "spring.jar";
-   private static final int ARCHIVE_TYPE = ArchiveTypes.JAR;
+
+   /** Field ARCHIVE_TYPE. (value is ArchiveType.JAR) */
+   private static final ArchiveType ARCHIVE_TYPE = ArchiveType.JAR;
+
+   /** Field CLASSFILE_VERSION. (value is ClassFile.JAVA_4) */
    private static final int CLASSFILE_VERSION = ClassFile.JAVA_4;
 
    /** Constructor */
@@ -46,12 +56,20 @@ public class Spring25 extends AbstractProfile
       super(CLASS_SET, ARCHIVE_TYPE, PROFILE_NAME, CLASSFILE_VERSION, PROFILE_LOCATION);
    }
 
+   /**
+    * Method getProfileCode.
+    * @return String
+    */
    @Override
    public String getProfileCode()
    {
       return PROFILE_CODE;
    }
 
+   /**
+    * Method getProfileName.
+    * @return String
+    */
    @Override
    protected String getProfileName()
    {

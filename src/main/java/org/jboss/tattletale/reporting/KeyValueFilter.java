@@ -22,21 +22,19 @@
 package org.jboss.tattletale.reporting;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 /**
  * Represents a key/value filter
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class KeyValueFilter implements Filter
 {
    /** KeyValue Filters */
-   private Map<String, SortedSet<String>> keyValueFilters;
+   private final Map<String, SortedSet<String>> keyValueFilters;
 
    /** Constructor */
    public KeyValueFilter()
@@ -46,8 +44,8 @@ public class KeyValueFilter implements Filter
 
    /**
     * Is filtered
-    *
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered()
     */
    public boolean isFiltered()
    {
@@ -56,9 +54,9 @@ public class KeyValueFilter implements Filter
 
    /**
     * Is filtered
-    *
     * @param archive The archive
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered(String)
     */
    public boolean isFiltered(String archive)
    {
@@ -67,16 +65,16 @@ public class KeyValueFilter implements Filter
 
    /**
     * Is filtered
-    *
     * @param archive The archive
     * @param query   The query
     * @return True if filtered; otherwise false
+    * @see org.jboss.tattletale.reporting.Filter#isFiltered(String, String)
     */
    public boolean isFiltered(String archive, String query)
    {
-      SortedSet<String> ss = keyValueFilters.get(archive);
+      final SortedSet<String> ss = keyValueFilters.get(archive);
 
-      if (ss != null)
+      if (null != ss)
       {
          if (query.endsWith(".class"))
          {
@@ -95,11 +93,8 @@ public class KeyValueFilter implements Filter
 
          query = query.replace('.', '/');
 
-         Iterator<String> it = ss.iterator();
-         while (it.hasNext())
+         for (String v : ss)
          {
-            String v = it.next();
-
             if (query.startsWith(v))
             {
                return true;
@@ -112,30 +107,24 @@ public class KeyValueFilter implements Filter
 
    /**
     * Init the filter
-    *
     * @param filter The filter value
+    * @see org.jboss.tattletale.reporting.Filter#init(String)
     */
    public void init(String filter)
    {
-      if (filter != null)
+      if (null != filter)
       {
-         StringTokenizer st = new StringTokenizer(filter, ";");
-         while (st.hasMoreTokens())
+         for (String token : filter.split(";"))
          {
-            String token = st.nextToken();
-
-            int equal = token.indexOf("=");
+            int equal = token.indexOf('=');
 
             String key = token.substring(0, equal);
             String values = token.substring(equal + 1);
 
-            SortedSet<String> v = new TreeSet<String>(new SizeComparator());
+            SortedSet<String> vs = new TreeSet<String>(new SizeComparator());
 
-            StringTokenizer vt = new StringTokenizer(values, ",");
-            while (vt.hasMoreTokens())
+            for (String value : values.split(","))
             {
-               String value = vt.nextToken();
-
                boolean includeAll = false;
 
                if (value.endsWith(".class"))
@@ -158,13 +147,13 @@ public class KeyValueFilter implements Filter
 
                if (includeAll)
                {
-                  value = value + '/';
+                  value += '/';
                }
 
-               v.add(value);
+               vs.add(value);
             }
 
-            keyValueFilters.put(key, v);
+            keyValueFilters.put(key, vs);
          }
       }
    }

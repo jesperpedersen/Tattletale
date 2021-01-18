@@ -21,23 +21,33 @@
  */
 package org.jboss.tattletale.profiles;
 
-import org.jboss.tattletale.core.ArchiveTypes;
-
 import javassist.bytecode.ClassFile;
+
+import org.jboss.tattletale.core.ArchiveType;
 
 /**
  * Sun: Java 6 (JCE)
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class SunJava6JCE extends AbstractProfile
 {
-
+   /** Field CLASS_SET. (value is ""sunjdk6-jce.clz.gz"") */
    private static final String CLASS_SET = "sunjdk6-jce.clz.gz";
+
+   /** Field PROFILE_NAME. (value is ""Sun Java 6 (JCE)"") */
    private static final String PROFILE_NAME = "Sun Java 6 (JCE)";
+
+   /** Field PROFILE_CODE. (value is ""jce6"") */
    private static final String PROFILE_CODE = "jce6";
+
+   /** Field PROFILE_LOCATION. (value is ""jce.jar"") */
    private static final String PROFILE_LOCATION = "jce.jar";
-   private static final int ARCHIVE_TYPE = ArchiveTypes.JAR;
+
+   /** Field ARCHIVE_TYPE. (value is ArchiveType.JAR) */
+   private static final ArchiveType ARCHIVE_TYPE = ArchiveType.JAR;
+
+   /** Field CLASSFILE_VERSION. (value type is ClassFile.JAVA_6) */
    private static final int CLASSFILE_VERSION = ClassFile.JAVA_6;
 
    /** Constructor */
@@ -46,12 +56,20 @@ public class SunJava6JCE extends AbstractProfile
       super(CLASS_SET, ARCHIVE_TYPE, PROFILE_NAME, CLASSFILE_VERSION, PROFILE_LOCATION);
    }
 
+   /**
+    * Method getProfileCode.
+    * @return String
+    */
    @Override
    public String getProfileCode()
    {
       return PROFILE_CODE;
    }
 
+   /**
+    * Method getProfileName.
+    * @return String
+    */
    @Override
    protected String getProfileName()
    {

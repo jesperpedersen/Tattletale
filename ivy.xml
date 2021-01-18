@@ -26,16 +26,15 @@
   <info organisation="org.jboss.tattletale" 
         module="tattletale"
         revision="${version}">
-    <license name="lgpl" url="http://repository.jboss.org/licenses/lgpl.txt"/>
-    <repository name="jboss" url="http://repository.jboss.org"/>
-    <description homepage="http://www.jboss.org/tattletale">
+    <license name="lgpl" url="https://repository.jboss.org/licenses/lgpl.txt"/>
+    <repository name="jboss" url="https://repository.jboss.org"/>
+    <description homepage="https://tattletale.jboss.org/">
       Tattletale - a software quality tool
     </description>
   </info>
 
   <configurations defaultconfmapping="core->default;tattletale->default;tattletale-ant->default;tattletale-maven->default">
     <conf name="core" transitive="false"/>
-
     <conf name="tattletale" transitive="false"/>
     <conf name="tattletale-ant" transitive="false"/>
     <conf name="tattletale-maven" transitive="false"/>
@@ -48,7 +47,7 @@
   </publications>
 
   <dependencies>
-    <dependency org="ant" name="ant" rev="${version.ant}" conf="core,tattletale-ant"/>
+    <dependency org="org.apache.ant" name="ant" rev="${version.ant}" conf="core,tattletale-ant"/>
     <dependency org="org.apache.maven" name="maven-plugin-api" rev="${version.maven}" conf="core,tattletale-maven"/>
     <dependency org="org.javassist" name="javassist" rev="${version.javassist}" conf="core,tattletale"/>
   </dependencies>

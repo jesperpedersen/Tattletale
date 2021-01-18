@@ -25,9 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -35,7 +33,7 @@ import java.util.jar.JarFile;
 /**
  * Tools to generate a profile for JBoss Application Server 7
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class Main
 {
@@ -52,19 +50,17 @@ public class Main
     */
    public static void main(String[] args)
    {
-      if (args != null && args.length == 2)
+      if (null != args && 2 == args.length)
       {
          FileWriter fw = null;
          try
          {
-            File root = new File(args[0], "modules");
-            File outputFile = new File(args[1]);
-            
+            final File root = new File(args[0], "modules");
+            final File outputFile = new File(args[1]);
+
             fw = new FileWriter(outputFile);
 
-            List<File> jars = getFileListing(root);
-
-            for (File f : jars)
+            for (File f : getFileListing(root))
             {
                String moduleId = "";
                String archiveName = f.getName();
@@ -77,11 +73,8 @@ public class Main
 
                JarFile jf = new JarFile(f);
 
-               Enumeration<JarEntry> e = jf.entries();
-               while (e.hasMoreElements())
+               for (JarEntry je : Collections.list(jf.entries()))
                {
-                  JarEntry je = e.nextElement();
-
                   if (je.getName().endsWith(".class"))
                   {
                      String className = je.getName().replace('/', '.');
@@ -100,7 +93,7 @@ public class Main
          }
          finally
          {
-            if (fw != null)
+            if (null != fw)
             {
                try
                {
@@ -122,36 +115,44 @@ public class Main
    /**
     * Recursively walk a directory tree and return a List of all
     * Files found; the List is sorted using File.compareTo().
-    *
     * @param aStartingDir is a valid directory, which can be read.
+    * @return List<File>
     */
-   private static List<File> getFileListing(File aStartingDir) throws Exception
+   private static List<File> getFileListing(File aStartingDir)
    {
-      List<File> result = getFileListingNoSort(aStartingDir);
+      final List<File> result = getFileListingNoSort(aStartingDir);
       Collections.sort(result);
       return result;
    }
 
-   private static List<File> getFileListingNoSort(File aStartingDir) throws Exception
+   /**
+    * Method getFileListingNoSort.
+    * @param aStartingDir File
+    * @return List<File>
+    */
+   private static List<File> getFileListingNoSort(File aStartingDir)
    {
-      List<File> result = new ArrayList<File>();
+      final File[] filesAndDirs = aStartingDir.listFiles();
 
-      File[] filesAndDirs = aStartingDir.listFiles();
+      if (filesAndDirs == null)
+      {
+         return Collections.emptyList();
+      }
 
-      List<File> filesDirs = Arrays.asList(filesAndDirs);
+      final List<File> result = new ArrayList<File>();
 
-      for (File file : filesDirs)
+      for (File file : filesAndDirs)
       {
          if (file.isFile())
          {
             String extension = null;
 
-            if (file.getName().lastIndexOf(".") != -1)
+            if (file.getName().lastIndexOf('.') != -1)
             {
-               extension = file.getName().substring(file.getName().lastIndexOf("."));
+               extension = file.getName().substring(file.getName().lastIndexOf('.'));
             }
 
-            if (extension != null && ".jar".equals(extension))
+            if (".jar".equals(extension))
             {
                result.add(file);
             }

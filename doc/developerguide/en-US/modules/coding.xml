@@ -4,7 +4,7 @@
 
   <section id="sourcecodestyle">
     <title>Source code formatting</title>
-    
+
     <para>JBoss Tattletale uses 3 spaces for indentation with curly brakets on the next line
       as the class or the statement.</para>
 
@@ -60,18 +60,18 @@ org.jboss.tattletale.reporting.Report
 
     <para>After you have implemented the new report you add it to the properties file 'jboss-tattletale.properties'. For example:</para>
 
- 	 <programlisting>
-	 	customreport.1=my.custom.package.customreport
-	 </programlisting>
-	
-	<para>
-		At runtime, as long as your custom jar file is in the classpath your custom report will be generated. 
-		If you were running from the command line for example:
-	</para>
-				
-	<programlisting>
-		java -classpath tattletale.jar:customreporting.jar org.jboss.tattletale.Main [directory-of-source-jar] [output-directory]
-	</programlisting>
+    <programlisting>
+customreport.1=my.custom.package.customreport
+    </programlisting>
+
+    <para>
+      At runtime, as long as your custom jar file is in the classpath your custom report will be generated.
+      If you were running from the command line for example:
+    </para>
+
+    <programlisting>
+java -classpath tattletale.jar:customreporting.jar org.jboss.tattletale.Main [directory-of-source-jar] [output-directory]
+    </programlisting>
   </section>
 
   <section id="cls">
@@ -82,7 +82,7 @@ org.jboss.tattletale.reporting.Report
     <para>The plugins must implement the</para>
 
     <programlisting>
- org.jboss.tattletale.reporting.classloader.ClassLoaderStructure
+org.jboss.tattletale.reporting.classloader.ClassLoaderStructure
     </programlisting>
 
     <para>interface and contain a default no-argument constructor.</para>

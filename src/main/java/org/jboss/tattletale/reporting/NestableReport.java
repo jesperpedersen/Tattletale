@@ -22,18 +22,16 @@
 
 package org.jboss.tattletale.reporting;
 
-import org.jboss.tattletale.core.Archive;
-import org.jboss.tattletale.core.ArchiveTypes;
-import org.jboss.tattletale.core.Location;
-import org.jboss.tattletale.core.NestableArchive;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 import javassist.bytecode.ClassFile;
 
+import org.jboss.tattletale.core.Archive;
+import org.jboss.tattletale.core.ArchiveType;
+import org.jboss.tattletale.core.Location;
+import org.jboss.tattletale.core.NestableArchive;
 
 /**
  * Report type used when generating an {@link ArchiveReport} for a {@link org.jboss.tattletale.core.NestableArchive}.
@@ -42,77 +40,87 @@ import javassist.bytecode.ClassFile;
  */
 public abstract class NestableReport extends ArchiveReport
 {
-   private NestableArchive nestableArchive;
+   /** Field nestableArchive. */
+   private final NestableArchive nestableArchive;
 
    /**
     * Constructor
-    *
     * @param id                  The report id
     * @param severity            The severity
     * @param nestableArchive     The nestable archive
     */
-   public NestableReport(String id, int severity, NestableArchive nestableArchive)
+   protected NestableReport(String id, ReportSeverity severity, NestableArchive nestableArchive)
    {
       super(id, severity, nestableArchive);
       this.nestableArchive = nestableArchive;
    }
 
+   /**
+    * Method writeHtmlBodyContent.
+    * @param bw BufferedWriter
+    * @throws IOException if an error occurs
+    */
    @Override
    public void writeHtmlBodyContent(BufferedWriter bw) throws IOException
    {
       bw.write("<table>" + Dump.newLine());
 
       bw.write("  <tr class=\"rowodd\">" + Dump.newLine());
-      bw.write("     <td>Name</td>" + Dump.newLine());
-      bw.write("     <td>" + nestableArchive.getName() + "</td>" + Dump.newLine());
+      bw.write("    <td>Name</td>" + Dump.newLine());
+      bw.write("    <td>" + nestableArchive.getName() + "</td>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       bw.write("  <tr class=\"roweven\">" + Dump.newLine());
-      bw.write("     <td>Class Version</td>" + Dump.newLine());
-      bw.write("     <td>");
+      bw.write("    <td>Class Version</td>" + Dump.newLine());
+      bw.write("    <td>");
 
-      if (ClassFile.JAVA_6 == nestableArchive.getVersion())
+      switch (nestableArchive.getVersion())
       {
-         bw.write("Java 6");
-      }
-      else if (ClassFile.JAVA_5 == nestableArchive.getVersion())
-      {
-         bw.write("Java 5");
-      }
-      else if (ClassFile.JAVA_4 == nestableArchive.getVersion())
-      {
-         bw.write("J2SE 1.4");
-      }
-      else if (ClassFile.JAVA_3 == nestableArchive.getVersion())
-      {
-         bw.write("J2SE 1.3");
-      }
-      else if (ClassFile.JAVA_2 == nestableArchive.getVersion())
-      {
-         bw.write("J2SE 1.2");
-      }
-      else if (ClassFile.JAVA_1 == nestableArchive.getVersion())
-      {
-         bw.write("JSE 1.0 / JSE 1.1");
+         case ClassFile.JAVA_9:
+            bw.write("Java 9");
+            break;
+         case ClassFile.JAVA_8:
+            bw.write("Java 8");
+            break;
+         case ClassFile.JAVA_7:
+            bw.write("Java 7");
+            break;
+         case ClassFile.JAVA_6:
+            bw.write("Java 6");
+            break;
+         case ClassFile.JAVA_5:
+            bw.write("Java 5");
+            break;
+         case ClassFile.JAVA_4:
+            bw.write("J2SE 1.4");
+            break;
+         case ClassFile.JAVA_3:
+            bw.write("J2SE 1.3");
+            break;
+         case ClassFile.JAVA_2:
+            bw.write("J2SE 1.2");
+            break;
+         case ClassFile.JAVA_1:
+            bw.write("JSE 1.0 / JSE 1.1");
+            break;
       }
 
-      bw.write("</td>" + Dump.newLine());
+      bw.write("    </td>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       bw.write("  <tr class=\"rowodd\">" + Dump.newLine());
-      bw.write("     <td>Locations</td>" + Dump.newLine());
-      bw.write("     <td>");
+      bw.write("    <td>Locations</td>" + Dump.newLine());
+      bw.write("    <td>");
 
-      bw.write("       <table>" + Dump.newLine());
+      bw.write("      <table>" + Dump.newLine());
 
       for (Location location : nestableArchive.getLocations())
       {
-
          bw.write("      <tr>" + Dump.newLine());
 
          bw.write("        <td>" + location.getFilename() + "</td>" + Dump.newLine());
          bw.write("        <td>");
-         if (location.getVersion() != null)
+         if (null != location.getVersion())
          {
             bw.write(location.getVersion());
          }
@@ -125,202 +133,126 @@ public abstract class NestableReport extends ArchiveReport
          bw.write("      </tr>" + Dump.newLine());
       }
 
-      bw.write("       </table>" + Dump.newLine());
+      bw.write("      </table>" + Dump.newLine());
+
+      bw.write("    </td>" + Dump.newLine());
+      bw.write("  </tr>" + Dump.newLine());
+
+      bw.write("  <tr class=\"roweven\">" + Dump.newLine());
+      bw.write("    <td>Profiles</td>" + Dump.newLine());
+      bw.write("    <td>");
+
+      bw.write(join(nestableArchive.getProfiles(), "<br/>"));
+
+      bw.write("    </td>" + Dump.newLine());
+      bw.write("  </tr>" + Dump.newLine());
+
+      bw.write("  <tr class=\"rowodd\">" + Dump.newLine());
+      bw.write("    <td>Manifest</td>" + Dump.newLine());
+      bw.write("    <td>");
+
+      bw.write(join(nestableArchive.getManifest(), "<br/>"));
 
       bw.write("</td>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       bw.write("  <tr class=\"roweven\">" + Dump.newLine());
-      bw.write("     <td>Profiles</td>" + Dump.newLine());
-      bw.write("     <td>");
+      bw.write("    <td>Signing information</td>" + Dump.newLine());
+      bw.write("    <td>");
 
-      if (nestableArchive.getProfiles() != null)
-      {
-         Iterator<String> pit = nestableArchive.getProfiles().iterator();
-         while (pit.hasNext())
-         {
-            String p = pit.next();
-
-            bw.write(p);
-
-            if (pit.hasNext())
-            {
-               bw.write("<br>");
-            }
-         }
-      }
-
-      bw.write("  <tr class=\"rowodd\">" + Dump.newLine());
-      bw.write("     <td>Manifest</td>" + Dump.newLine());
-      bw.write("     <td>");
-
-      if (nestableArchive.getManifest() != null)
-      {
-         Iterator<String> mit = nestableArchive.getManifest().iterator();
-         while (mit.hasNext())
-         {
-            String m = mit.next();
-
-            bw.write(m);
-
-            if (mit.hasNext())
-            {
-               bw.write("<br>");
-            }
-         }
-      }
-
-      bw.write("</td>" + Dump.newLine());
-      bw.write("  </tr>" + Dump.newLine());
-
-      bw.write("  <tr class=\"roweven\">" + Dump.newLine());
-      bw.write("     <td>Signing information</td>" + Dump.newLine());
-      bw.write("     <td>");
-
-      if (nestableArchive.getSign() != null)
-      {
-         Iterator<String> sit = nestableArchive.getSign().iterator();
-         while (sit.hasNext())
-         {
-            String s = sit.next();
-
-            bw.write(s);
-
-            if (sit.hasNext())
-            {
-               bw.write("<br>");
-            }
-         }
-      }
+      bw.write(join(nestableArchive.getSign(), "<br/>"));
 
       bw.write("</td>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       bw.write("  <tr class=\"rowodd\">" + Dump.newLine());
-      bw.write("     <td>Requires</td>" + Dump.newLine());
-      bw.write("     <td>");
+      bw.write("    <td>Requires</td>" + Dump.newLine());
+      bw.write("    <td>");
 
-      Iterator<String> rit = nestableArchive.getRequires().iterator();
-      while (rit.hasNext())
-      {
-         String require = rit.next();
-
-         bw.write(require);
-
-         if (rit.hasNext())
-         {
-            bw.write("<br>");
-         }
-      }
+      bw.write(join(nestableArchive.getRequires(), "<br/>"));
 
       bw.write("</td>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       // Table of Provides.
       bw.write("  <tr class=\"roweven\">" + Dump.newLine());
-      bw.write("     <td>Provides</td>" + Dump.newLine());
-      bw.write("     <td>" + Dump.newLine());
+      bw.write("    <td>Provides</td>" + Dump.newLine());
+      bw.write("    <td>" + Dump.newLine());
 
-      bw.write("       <table>" + Dump.newLine());
+      bw.write("      <table>" + Dump.newLine());
 
       for (Map.Entry<String, Long> entry : nestableArchive.getProvides().entrySet())
       {
-
-         String name = entry.getKey();
          Long serialVersionUID = entry.getValue();
 
-         bw.write("         <tr>" + Dump.newLine());
-         bw.write("           <td>" + name + "</td>" + Dump.newLine());
+         bw.write("        <tr>" + Dump.newLine());
+         bw.write("          <td>" + entry.getKey() + "</td>" + Dump.newLine());
 
-         if (serialVersionUID != null)
+         if (null != serialVersionUID)
          {
-            bw.write("           <td>" + serialVersionUID + "</td>" + Dump.newLine());
+            bw.write("          <td>" + serialVersionUID + "</td>" + Dump.newLine());
          }
          else
          {
-            bw.write("           <td>&nbsp;</td>" + Dump.newLine());
+            bw.write("          <td>&nbsp;</td>" + Dump.newLine());
          }
-         bw.write("         </tr>" + Dump.newLine());
+         bw.write("        </tr>" + Dump.newLine());
       }
-      bw.write("       </table>" + Dump.newLine());
+      bw.write("      </table>" + Dump.newLine());
 
-      bw.write("</td>" + Dump.newLine());
+      bw.write("    </td>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       // Sub-archives
       bw.write("  <tr class=\"rowodd\">" + Dump.newLine());
-      bw.write("     <td>Sub-Archives</td>" + Dump.newLine());
-      bw.write("     <td>" + Dump.newLine());
+      bw.write("    <td>Sub-Archives</td>" + Dump.newLine());
+      bw.write("    <td>" + Dump.newLine());
 
-      bw.write("        <table>" + Dump.newLine());
+      bw.write("      <table>" + Dump.newLine());
 
       // The base output path for all of the sub archives.
-      String outputPath = getOutputDirectory().getPath();
+      final String outputPath = getOutputDirectory().getPath();
 
       for (Archive subArchive : nestableArchive.getSubArchives())
       {
-         String archiveName = subArchive.getName();
-         int finalDot = archiveName.lastIndexOf(".");
-         String extension = archiveName.substring(finalDot + 1);
-
          ArchiveReport report = null;
          int depth = 1;
 
-         if (subArchive.getType() == ArchiveTypes.JAR)
+         if (subArchive.getType() == ArchiveType.JAR)
          {
-
-            if (subArchive.getParentArchive() != null && subArchive.getParentArchive().getParentArchive() != null)
+            if (null != subArchive.getParentArchive() && null != subArchive.getParentArchive().getParentArchive())
             {
                depth = 3;
             }
-            else if (subArchive.getParentArchive() != null)
+            else if (null != subArchive.getParentArchive())
             {
                depth = 2;
             }
             report = new JarReport(subArchive, depth);
          }
-         else if (subArchive.getType() == ArchiveTypes.WAR)
+         else if (subArchive.getType() == ArchiveType.WAR)
          {
             NestableArchive nestedSubArchive = (NestableArchive) subArchive;
 
-            if (subArchive.getParentArchive() != null)
+            if (null != subArchive.getParentArchive())
             {
                depth = 2;
             }
-            report = new WarReport(nestedSubArchive, 2);
+            report = new WarReport(nestedSubArchive, depth);
          }
 
-         if (!archiveName.contains("WEB-INF/classes"))
+         if (subArchive.getType() != ArchiveType.CLASS)
          {
             report.generate(outputPath);
             bw.write("        <tr>" + Dump.newLine());
-            bw.write("           <td><a href=\"./" + extension + "/" + archiveName + ".html\">" + archiveName
-                  + "</a></td>" + Dump.newLine());
+            bw.write("          <td>" + hrefToArchiveReport(subArchive, true) + "</td>" + Dump.newLine());
             bw.write("        </tr>" + Dump.newLine());
-
          }
       }
-      bw.write("        </table>" + Dump.newLine());
-      bw.write("     </td>" + Dump.newLine());
-      bw.write("  </tr>");
+      bw.write("      </table>" + Dump.newLine());
+      bw.write("    </td>" + Dump.newLine());
+      bw.write("  </tr>" + Dump.newLine());
 
       bw.write("</table>" + Dump.newLine());
-   }
-
-/**
-    * write out the header of the report's content
-    *
-    * @param bw the writer to use
-    * @throws IOException if an error occurs
-    */
-   public void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
-   {
-      bw.write("<body>" + Dump.newLine());
-      bw.write(Dump.newLine());
-
-      bw.write("<h1>" + nestableArchive.getName() + "</h1>" + Dump.newLine());
-
-      bw.write("<a href=\"../index.html\">Main</a>" + Dump.newLine());
-      bw.write("<p>" + Dump.newLine());
    }
 }

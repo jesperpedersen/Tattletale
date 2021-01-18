@@ -24,9 +24,9 @@
   -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-<!--
-    <xsl:param name="use.id.as.filename">1</xsl:param>
--->
+    <!--
+        <xsl:param name="use.id.as.filename">1</xsl:param>
+    -->
     <xsl:param name="legalnotice.filename">legalnotice.html</xsl:param>
 
     <xsl:template match="legalnotice" mode="chunk-filename">
@@ -34,7 +34,7 @@
     </xsl:template>
 
     <xsl:template name="user.footer.content">
-        <HR/>
+        <hr/>
         <a>
             <xsl:attribute name="href">
                 <xsl:apply-templates select="//legalnotice[1]" mode="chunk-filename"/>

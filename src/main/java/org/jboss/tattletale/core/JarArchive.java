@@ -28,13 +28,13 @@ import java.util.SortedSet;
 /**
  * JAR Archive
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
+@SuppressWarnings("serial")
 public class JarArchive extends Archive
 {
    /**
     * Constructor
-    *
     * @param name                    The name
     * @param version                 The version number
     * @param manifest                The manifest
@@ -52,7 +52,7 @@ public class JarArchive extends Archive
                      SortedMap<String, SortedSet<String>> packageDependencies,
                      SortedMap<String, SortedSet<String>> blacklistedDependencies, Location location)
    {
-      super(ArchiveTypes.JAR, name, version, manifest, sign, requires, provides, classDependencies,
+      super(ArchiveType.JAR, name, version, manifest, sign, requires, provides, classDependencies,
             packageDependencies, blacklistedDependencies, location);
    }
 }

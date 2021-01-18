@@ -21,34 +21,32 @@
  */
 package org.jboss.tattletale.reporting;
 
-import org.jboss.tattletale.core.Archive;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
+
+import org.jboss.tattletale.core.Archive;
 
 /**
  * A report that shows unused JAR archives
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
-public class UnusedJarReport extends AbstractReport
+public class UnusedReport extends AbstractReport
 {
    /** NAME */
-   private static final String NAME = "Unused Jar";
+   private static final String NAME = "Unused";
 
    /** DIRECTORY */
-   private static final String DIRECTORY = "unusedjar";
+   private static final String DIRECTORY = "unused";
 
    /** Constructor */
-   public UnusedJarReport()
+   public UnusedReport()
    {
       super(DIRECTORY, ReportSeverity.WARNING, NAME, DIRECTORY);
    }
 
    /**
     * Write out the report's content
-    *
     * @param bw the writer to use
     * @throws IOException if an error occurs
     */
@@ -57,8 +55,8 @@ public class UnusedJarReport extends AbstractReport
       bw.write("<table>" + Dump.newLine());
 
       bw.write("  <tr>" + Dump.newLine());
-      bw.write("     <th>Archive</th>" + Dump.newLine());
-      bw.write("     <th>Used</th>" + Dump.newLine());
+      bw.write("    <th>Archive</th>" + Dump.newLine());
+      bw.write("    <th>Used</th>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       boolean odd = true;
@@ -68,31 +66,26 @@ public class UnusedJarReport extends AbstractReport
       for (Archive archive : archives)
       {
          boolean archiveStatus = false;
-
          String archiveName = archive.getName();
-         int finalDot = archiveName.lastIndexOf(".");
-         String extension = archiveName.substring(finalDot + 1);
 
-         Iterator<Archive> it = archives.iterator();
-         while (!archiveStatus && it.hasNext())
+         for (Archive a : archives)
          {
-            Archive a = it.next();
-
-            if (!archive.getName().equals(a.getName()))
+            if (!archiveName.equals(a.getName()))
             {
-               Iterator<String> sit = a.getRequires().iterator();
-               while (!archiveStatus && sit.hasNext())
+               for (String require : a.getRequires())
                {
-                  String require = sit.next();
-
-                  if (archive.getProvides().keySet().contains(require))
+                  if (archive.getProvides().containsKey(require))
                   {
                      archiveStatus = true;
+                     break;
                   }
                }
             }
+            if (archiveStatus)
+            {
+               break;
+            }
          }
-
 
          if (odd)
          {
@@ -102,26 +95,25 @@ public class UnusedJarReport extends AbstractReport
          {
             bw.write("  <tr class=\"roweven\">" + Dump.newLine());
          }
-         bw.write("     <td><a href=\"../" + extension + "/" + archiveName +
-                  ".html\">" + archiveName + "</a></td>" + Dump.newLine());
+
+         bw.write("    <td>" + hrefToArchiveReport(archive) + "</td>" + Dump.newLine());
 
          if (archiveStatus)
          {
-            bw.write("     <td style=\"color: green;\">Yes</td>" + Dump.newLine());
             used++;
+            bw.write("    <td style=\"color: green;\">Yes</td>" + Dump.newLine());
          }
          else
          {
             unused++;
-
-            if (!isFiltered(archive.getName()))
+            if (!isFiltered(archiveName))
             {
                status = ReportStatus.YELLOW;
-               bw.write("     <td style=\"color: red;\">No</td>" + Dump.newLine());
+               bw.write("    <td style=\"color: red;\">No</td>" + Dump.newLine());
             }
             else
             {
-               bw.write("     <td style=\"color: red; text-decoration: line-through;\">No</td>" + Dump.newLine());
+               bw.write("    <td style=\"color: red; text-decoration: line-through;\">No</td>" + Dump.newLine());
             }
          }
 
@@ -133,48 +125,29 @@ public class UnusedJarReport extends AbstractReport
       bw.write("</table>" + Dump.newLine());
 
       bw.write(Dump.newLine());
-      bw.write("<p>" + Dump.newLine());
 
       bw.write("<table>" + Dump.newLine());
 
       bw.write("  <tr>" + Dump.newLine());
-      bw.write("     <th>Status</th>" + Dump.newLine());
-      bw.write("     <th>Archives</th>" + Dump.newLine());
+      bw.write("    <th>Status</th>" + Dump.newLine());
+      bw.write("    <th>Archives</th>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       bw.write("  <tr class=\"rowodd\">" + Dump.newLine());
-      bw.write("     <td>Used</td>" + Dump.newLine());
-      bw.write("     <td style=\"color: green;\">" + used + "</td>" + Dump.newLine());
+      bw.write("    <td>Used</td>" + Dump.newLine());
+      bw.write("    <td style=\"color: green;\">" + used + "</td>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       bw.write("  <tr class=\"roweven\">" + Dump.newLine());
-      bw.write("     <td>Unused</td>" + Dump.newLine());
-      bw.write("     <td style=\"color: red;\">" + unused + "</td>" + Dump.newLine());
+      bw.write("    <td>Unused</td>" + Dump.newLine());
+      bw.write("    <td style=\"color: red;\">" + unused + "</td>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
 
       bw.write("</table>" + Dump.newLine());
    }
 
    /**
-    * write out the header of the report's content
-    *
-    * @param bw the writer to use
-    * @throws IOException if an errror occurs
-    */
-   public void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
-   {
-      bw.write("<body>" + Dump.newLine());
-      bw.write(Dump.newLine());
-
-      bw.write("<h1>" + NAME + "</h1>" + Dump.newLine());
-
-      bw.write("<a href=\"../index.html\">Main</a>" + Dump.newLine());
-      bw.write("<p>" + Dump.newLine());
-   }
-
-   /**
     * Create filter
-    *
     * @return The filter
     */
    @Override

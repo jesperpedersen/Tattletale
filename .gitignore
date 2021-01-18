@@ -1,6 +1,19 @@
 # Ignore files created by IntelliJ Idea IDE
 .idea/
-src/main/Main.iml
+*.iml
+
+# Ignore Eclipse IDE
+.checkstyle
+.classpath
+.project
+.settings/
+
+# Ignore NetBeans IDE
+nbproject/
+nb-build.xml
+
+# Ignore MacOS stuff
+.DS_Store
 
 # Ignore files created by Ant when building
 build/
@@ -8,6 +21,7 @@ dist/
 lib/
 out/
 reports/
+doc/api/
 
 # Don't ask why the hack files are being ignored :-)
 *hack*
@@ -15,3 +29,5 @@ reports/
 # Annoying tilde's from GEdit
 *~
 
+# Generated code
+Version.java

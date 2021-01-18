@@ -21,19 +21,21 @@
  */
 package org.jboss.tattletale.reporting;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.SortedSet;
+
 import org.jboss.tattletale.core.Archive;
 import org.jboss.tattletale.core.Location;
 import org.jboss.tattletale.core.NestableArchive;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-
 /**
  * Multiple locations report
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  * @author <a href="mailto:torben.jaeger@jit-consulting.de">Torben Jaeger</a>
  */
 public class MultipleLocationsReport extends AbstractReport
@@ -52,7 +54,6 @@ public class MultipleLocationsReport extends AbstractReport
 
    /**
     * write out the report's content
-    *
     * @param bw the writer to use
     * @throws IOException if an error occurs
     */
@@ -61,13 +62,19 @@ public class MultipleLocationsReport extends AbstractReport
       bw.write("<table>" + Dump.newLine());
 
       bw.write("  <tr>" + Dump.newLine());
-      bw.write("     <th>Name</th>" + Dump.newLine());
-      bw.write("     <th>Location</th>" + Dump.newLine());
+      bw.write("    <th>Archive</th>" + Dump.newLine());
+      bw.write("    <th>Location</th>" + Dump.newLine());
       bw.write("  </tr>" + Dump.newLine());
       recursivelyWriteContent(bw, archives);
       bw.write("</table>" + Dump.newLine());
    }
 
+   /**
+    * Method recursivelyWriteContent.
+    * @param bw BufferedWriter
+    * @param archives Collection<Archive>
+    * @throws IOException
+    */
    private void recursivelyWriteContent(BufferedWriter bw, Collection<Archive> archives) throws IOException
    {
       boolean odd = true;
@@ -78,16 +85,12 @@ public class MultipleLocationsReport extends AbstractReport
          {
             NestableArchive nestableArchive = (NestableArchive) a;
             recursivelyWriteContent(bw, nestableArchive.getSubArchives());
+            continue;
          }
-         else if (a.getLocations().size() > 1)
+
+         SortedSet<Location> locations = a.getLocations();
+         if (locations.size() > 1)
          {
-            boolean filtered = isFiltered(a.getName());
-
-            if (!filtered)
-            {
-               status = ReportStatus.YELLOW;
-            }
-
             if (odd)
             {
                bw.write("  <tr class=\"rowodd\">" + Dump.newLine());
@@ -96,58 +99,35 @@ public class MultipleLocationsReport extends AbstractReport
             {
                bw.write("  <tr class=\"roweven\">" + Dump.newLine());
             }
-            bw.write("     <td><a href=\"../jar/" + a.getName() + ".html\">" +
-                     a.getName() + "</a></td>" + Dump.newLine());
-            if (!filtered)
+
+            bw.write("    <td>" + hrefToArchiveReport(a) + "</td>" + Dump.newLine());
+
+            if (!isFiltered(a.getName()))
             {
-               bw.write("     <td>");
+               status = ReportStatus.YELLOW;
+               bw.write("    <td>");
             }
             else
             {
-               bw.write("     <td style=\"text-decoration: line-through;\">");
+               bw.write("    <td style=\"text-decoration: line-through;\">");
             }
-
-            Iterator<Location> lit = a.getLocations().iterator();
-            while (lit.hasNext())
+            List<String> files = new ArrayList<String>();
+            for (Location location : locations)
             {
-               Location location = lit.next();
-               bw.write(location.getFilename());
-
-               if (lit.hasNext())
-               {
-                  bw.write("<br>");
-               }
+               files.add(location.getFilename());
             }
-
+            bw.write(join(files, "<br/>"));
             bw.write("</td>" + Dump.newLine());
+
             bw.write("  </tr>" + Dump.newLine());
 
             odd = !odd;
          }
       }
-
-   }
-
-   /**
-    * write out the header of the report's content
-    *
-    * @param bw the writer to use
-    * @throws IOException if an errror occurs
-    */
-   public void writeHtmlBodyHeader(BufferedWriter bw) throws IOException
-   {
-      bw.write("<body>" + Dump.newLine());
-      bw.write(Dump.newLine());
-
-      bw.write("<h1>" + NAME + "</h1>" + Dump.newLine());
-
-      bw.write("<a href=\"../index.html\">Main</a>" + Dump.newLine());
-      bw.write("<p>" + Dump.newLine());
    }
 
    /**
     * Create filter
-    *
     * @return The filter
     */
    @Override

@@ -90,10 +90,8 @@
             </xsl:otherwise>
         </xsl:choose>
         <!--
-  <fo:bookmark internal-destination="{$id}"/>
--->
+        <fo:bookmark internal-destination="{$id}"/>
+        -->
     </xsl:template>
 
-
 </xsl:stylesheet>
-

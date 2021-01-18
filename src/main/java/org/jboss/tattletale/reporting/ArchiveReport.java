@@ -26,30 +26,29 @@ import org.jboss.tattletale.core.Archive;
 /**
  * Represents an archive report (JAR, WAR, EAR, ...)
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public abstract class ArchiveReport extends AbstractReport
 {
    /** The archive */
-   protected Archive archive;
+   protected final Archive archive;
 
    /**
     * Constructor
-    *
     * @param id       The report id
     * @param severity The severity
     * @param archive  The archive
     */
-   public ArchiveReport(String id, int severity, Archive archive)
+   protected ArchiveReport(String id, ReportSeverity severity, Archive archive)
    {
-      super(id, severity);
+      super(id, severity, archive.getName(), id);
       this.archive = archive;
    }
 
    /**
     * Get the name of the report
-    *
     * @return The name
+    * @see org.jboss.tattletale.reporting.Report#getName()
     */
    public String getName()
    {

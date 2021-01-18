@@ -31,13 +31,13 @@ import java.util.Set;
 public class ProfileArchive implements Profile
 {
    /** Archive name */
-   private String archiveName;
+   private final String archiveName;
 
    /** The module identifier */
-   private String moduleIdentifier;
+   private final String moduleIdentifier;
 
    /** Set of classes*/
-   private Set<String> classes;
+   private final Set<String> classes;
 
    /**
     * Constructor
@@ -49,14 +49,14 @@ public class ProfileArchive implements Profile
    {
       this.archiveName = archiveName;
       this.moduleIdentifier = moduleIdentifier;
-      this.classes = new HashSet<String>();
+      classes = new HashSet<String>();
    }
 
    /**
     * Whether or not the class passed is provided in the local set of class names.
-    *
     * @param clz  - the string representation of the class.
     * @return     - whether or not the class name exists in the local set.
+    * @see org.jboss.tattletale.profiles.Profile#doesProvide(String)
     */
    public boolean doesProvide(String clz)
    {
@@ -65,8 +65,8 @@ public class ProfileArchive implements Profile
 
    /**
     * Gets the name of the archive.
-    *
     * @return  - the name of the archive.
+    * @see org.jboss.tattletale.profiles.Profile#getName()
     */
    public String getName()
    {
@@ -75,8 +75,8 @@ public class ProfileArchive implements Profile
 
    /**
     * Gets the name of the module identifier.
-    *
     * @return  - the module identifier.
+    * @see org.jboss.tattletale.profiles.Profile#getModuleIdentifier()
     */
    public String getModuleIdentifier()
    {
@@ -85,7 +85,6 @@ public class ProfileArchive implements Profile
 
    /**
     * Adds the parameter to the local set of classes.
-    *
     * @param className  - the name of the class to add.
     */
    public void addClass(String className)

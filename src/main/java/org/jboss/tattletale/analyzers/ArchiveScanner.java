@@ -22,9 +22,6 @@
 
 package org.jboss.tattletale.analyzers;
 
-import org.jboss.tattletale.core.Archive;
-import org.jboss.tattletale.profiles.Profile;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -32,22 +29,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.jboss.tattletale.core.Archive;
+import org.jboss.tattletale.profiles.Profile;
+
 /**
- * Interface that will be used on the top level in order to scan different archive types (.jar, .war, .ear etc).
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * Interface that will be used on the top level in order to scan different archive types (.jar, .war/.rar, .ear).
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  * @author Navin Surtani
- * */
+ */
 public interface ArchiveScanner
 {
    /**
     * Scan an archive
-    *
     * @param file -  The file to be scanned.
     * @return The archive
-    *
     * @throws IOException - If there is an error with the input streams.
     */
-   public Archive scan(File file) throws IOException;
+   Archive scan(File file) throws IOException;
 
    /**
     * Scan an archive
@@ -55,11 +53,9 @@ public interface ArchiveScanner
     * @param gProvides   The global provides map
     * @param known       The set of known archives
     * @param blacklisted The set of black listed packages
-    * @throws IOException - If there is an error with the input streams.
     * @return The archive
+    * @throws IOException - If there is an error with the input streams.
     */
-
-   public Archive scan(File file, Map<String, SortedSet<String>> gProvides,
-                              List<Profile> known, Set<String> blacklisted) throws IOException;
-
+   Archive scan(File file, Map<String, SortedSet<String>> gProvides,
+                List<Profile> known, Set<String> blacklisted) throws IOException;
 }

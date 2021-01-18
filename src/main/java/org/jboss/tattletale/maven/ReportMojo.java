@@ -21,15 +21,14 @@
  */
 package org.jboss.tattletale.maven;
 
-import org.jboss.tattletale.Main;
-
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+import org.jboss.tattletale.Main;
+
 /**
- * Implementation class for TattleTale Report Maven Mojo
+ * Implementation class for Tattletale Report Maven Mojo
  *
- * @author Jesper Pedersen <jesper.pedersen@jboss.org>
+ * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class ReportMojo extends TattletaleMojo
 {
@@ -63,24 +62,39 @@ public class ReportMojo extends TattletaleMojo
    /** Scan */
    private String scan;
 
+   /** Title */
+   private String title;
+
+   /** Extract pattern */
+   private String extractPattern;
+
+   /** Bundle pattern */
+   private String bundlePattern;
+
+   /** Analyze components */
+   private boolean analyzeComponents;
+
    /** Constructor */
    public ReportMojo()
    {
-      this.classloaderStructure = null;
-      this.profiles = null;
-      this.excludes = null;
-      this.blacklisted = null;
-      this.failOnInfo = false;
-      this.failOnWarn = false;
-      this.failOnError = false;
-      this.deleteOutputDirectory = true;
-      this.reports = null;
-      this.scan = null;
+      classloaderStructure = null;
+      profiles = null;
+      excludes = null;
+      blacklisted = null;
+      failOnInfo = false;
+      failOnWarn = false;
+      failOnError = false;
+      deleteOutputDirectory = true;
+      reports = null;
+      scan = null;
+      title = null;
+      extractPattern = null;
+      bundlePattern = null;
+      analyzeComponents = false;
    }
 
    /**
     * Get the class loader structure
-    *
     * @return The value
     */
    public String getClassloader()
@@ -90,17 +104,15 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set the class loader structure
-    *
-    * @param cls The value
+    * @param classloaderStructure The value
     */
-   public void setClassloader(String cls)
+   public void setClassloader(String classloaderStructure)
    {
-      this.classloaderStructure = cls;
+      this.classloaderStructure = classloaderStructure;
    }
 
    /**
     * Get the reports
-    *
     * @return The value
     */
    public String[] getReports()
@@ -110,7 +122,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set the reports
-    *
     * @param reports The value
     */
    public void setReports(String[] reports)
@@ -120,7 +131,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Get the profiles
-    *
     * @return The value
     */
    public String[] getProfiles()
@@ -130,7 +140,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set the profiles
-    *
     * @param profiles The value
     */
    public void setProfiles(String[] profiles)
@@ -140,7 +149,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Get the excludes
-    *
     * @return The value
     */
    public String[] getExcludes()
@@ -150,7 +158,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set the excludes
-    *
     * @param excludes The value
     */
    public void setExcludes(String[] excludes)
@@ -160,7 +167,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Get the blacklisted
-    *
     * @return The value
     */
    public String[] getBlacklisted()
@@ -170,7 +176,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set the blacklisted
-    *
     * @param blacklisted The value
     */
    public void setBlacklisted(String[] blacklisted)
@@ -180,7 +185,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Get fail on info
-    *
     * @return The value
     */
    public boolean getFailOnInfo()
@@ -190,17 +194,15 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set fail on info
-    *
-    * @param b The value
+    * @param failOnInfo The value
     */
-   public void setFailOnInfo(boolean b)
+   public void setFailOnInfo(boolean failOnInfo)
    {
-      this.failOnInfo = b;
+      this.failOnInfo = failOnInfo;
    }
 
    /**
     * Get fail on warn
-    *
     * @return The value
     */
    public boolean getFailOnWarn()
@@ -210,17 +212,15 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set fail on warn
-    *
-    * @param b The value
+    * @param failOnWarn The value
     */
-   public void setFailOnWarn(boolean b)
+   public void setFailOnWarn(boolean failOnWarn)
    {
-      this.failOnWarn = b;
+      this.failOnWarn = failOnWarn;
    }
 
    /**
     * Get fail on error
-    *
     * @return The value
     */
    public boolean getFailOnError()
@@ -230,17 +230,15 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set fail on error
-    *
-    * @param b The value
+    * @param failOnError The value
     */
-   public void setFailOnError(boolean b)
+   public void setFailOnError(boolean failOnError)
    {
-      this.failOnError = b;
+      this.failOnError = failOnError;
    }
 
    /**
     * Get delete output directory
-    *
     * @return The value
     */
    public boolean getDeleteOutputDirectory()
@@ -250,17 +248,15 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set delete output directory
-    *
-    * @param b The value
+    * @param deleteOutputDirectory The value
     */
-   public void setDeleteOutputDirectory(boolean b)
+   public void setDeleteOutputDirectory(boolean deleteOutputDirectory)
    {
-      this.deleteOutputDirectory = b;
+      this.deleteOutputDirectory = deleteOutputDirectory;
    }
 
    /**
     * Get the scan
-    *
     * @return The value
     */
    public String getScan()
@@ -270,7 +266,6 @@ public class ReportMojo extends TattletaleMojo
 
    /**
     * Set the scan
-    *
     * @param scan The value
     */
    public void setScan(String scan)
@@ -279,86 +274,145 @@ public class ReportMojo extends TattletaleMojo
    }
 
    /**
+    * Get the title
+    * @return The value
+    */
+   public String getTitle()
+   {
+      return title;
+   }
+
+   /**
+    * Set the title
+    * @param title The value
+    */
+   public void setTitle(String title)
+   {
+      this.title = title;
+   }
+
+   /**
+    * Get the extractPattern
+    * @return The value
+    */
+   public String getExtractPattern()
+   {
+      return extractPattern;
+   }
+
+   /**
+    * Set the extractPattern
+    * @param extractPattern The value
+    */
+   public void setExtractPattern(String extractPattern)
+   {
+      this.extractPattern = extractPattern;
+   }
+
+   /**
+    * Get the bundlePattern
+    * @return The value
+    */
+   public String getBundlePattern()
+   {
+      return bundlePattern;
+   }
+
+   /**
+    * Set the bundlePattern
+    * @param bundlePattern The value
+    */
+   public void setBundlePattern(String bundlePattern)
+   {
+      this.bundlePattern = bundlePattern;
+   }
+
+   /**
+    * Get the analyzeComponents
+    * @return The value
+    */
+   public boolean getAnalyzeComponents()
+   {
+      return analyzeComponents;
+   }
+
+   /**
+    * Set the analyzeComponents
+    * @param analyzeComponents The value
+    */
+   public void setAnalyzeComponents(boolean analyzeComponents)
+   {
+      this.analyzeComponents = analyzeComponents;
+   }
+
+   /**
     * Execute
-    *
-    * @throws MojoExecutionException Thrown if the plugin cant be executed
     * @throws MojoFailureException   Thrown if there is an error
+    * @see org.apache.maven.plugin.Mojo#execute()
     */
    @Override
-   public void execute() throws MojoExecutionException, MojoFailureException
+   public void execute() throws MojoFailureException
    {
       try
       {
-         Main main = new Main();
+         final Main main = new Main();
 
          main.setSource(getSource().getAbsolutePath());
          main.setDestination(getDestination().getAbsolutePath());
 
-         if (getConfiguration() != null)
+         if (null != getConfiguration())
          {
-            main.setConfiguration(getConfiguration().getAbsolutePath());
+            main.setConfigurationFile(getConfiguration().getAbsolutePath());
          }
 
-         if (getFilter() != null)
+         if (null != getFilter())
          {
             main.setFilter(getFilter().getAbsolutePath());
          }
 
          main.setClassLoaderStructure(getClassloader());
 
-         if (getReports() != null)
+         if (null != getReports())
          {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < getReports().length; i++)
+            final StringBuilder sb = new StringBuilder();
+            for (String report : getReports())
             {
-               sb = sb.append(getReports()[i]);
-               if (i < getReports().length - 1)
-               {
-                  sb = sb.append(",");
-               }
+               sb.append(report).append(',');
             }
+            sb.setLength(sb.length() - 1);
             main.setReports(sb.toString());
          }
 
-         if (getProfiles() != null)
+         if (null != getProfiles())
          {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < getProfiles().length; i++)
+            final StringBuilder sb = new StringBuilder();
+            for (String profile : getProfiles())
             {
-               sb = sb.append(getProfiles()[i]);
-               if (i < getProfiles().length - 1)
-               {
-                  sb = sb.append(",");
-               }
+               sb.append(profile).append(',');
             }
+            sb.setLength(sb.length() - 1);
             main.setProfiles(sb.toString());
          }
 
-         if (getExcludes() != null)
+         if (null != getExcludes())
          {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < getExcludes().length; i++)
+            final StringBuilder sb = new StringBuilder();
+            for (String exclude : getExcludes())
             {
-               sb = sb.append(getExcludes()[i]);
-               if (i < getExcludes().length - 1)
-               {
-                  sb = sb.append(",");
-               }
+               sb.append(exclude).append(',');
             }
+            sb.setLength(sb.length() - 1);
             main.setExcludes(sb.toString());
          }
 
-         if (getBlacklisted() != null)
+         if (null != getBlacklisted())
          {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < getBlacklisted().length; i++)
+            final StringBuilder sb = new StringBuilder();
+            for (String bl : getBlacklisted())
             {
-               sb = sb.append(getBlacklisted()[i]);
-               if (i < getBlacklisted().length - 1)
-               {
-                  sb = sb.append(",");
-               }
+               sb.append(bl).append(',');
             }
+            sb.setLength(sb.length() - 1);
             main.setBlacklisted(sb.toString());
          }
 
@@ -368,10 +422,13 @@ public class ReportMojo extends TattletaleMojo
          main.setDeleteOutputDirectory(getDeleteOutputDirectory());
 
          main.setScan(getScan());
+         main.setTitle(getTitle());
+         main.setExtractPattern(getExtractPattern());
+         main.setBundlePattern(getBundlePattern());
 
          getLog().info("Scanning: " + getSource().getAbsolutePath());
 
-         main.execute();
+         main.execute(analyzeComponents);
       }
       catch (Throwable t)
       {
